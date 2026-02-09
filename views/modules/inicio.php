@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinePOS - Sistema de Venta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff0066;
+            --primary-dark: #cc0052;
+            --secondary: #00ffcc;
+            --dark: #0a0a0f;
+            --dark-light: #1a1a24;
+            --dark-lighter: #2a2a38;
+            --text: #ffffff;
+            --text-dim: #a0a0b0;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, var(--dark) 0%, #12121c 100%);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* LOGIN SCREEN */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 0, 102, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 204, 0.1) 0%, transparent 50%),
+                var(--dark);
+        }
+
+        .login-box {
+            background: var(--dark-light);
+            padding: 60px 50px;
+            border: 3px solid var(--primary);
+            box-shadow: 
+                0 0 40px rgba(255, 0, 102, 0.3),
+                inset 0 0 40px rgba(255, 0, 102, 0.05);
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-logo {
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 52px;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 11px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--secondary);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            background: var(--dark);
+            border: 2px solid var(--dark-lighter);
+            color: var(--text);
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(255, 0, 102, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary);
+            border: none;
+            color: var(--text);
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 0 30px rgba(255, 0, 102, 0.6);
+        }
+
+        .login-hint {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 10px;
+            margin-top: 20px;
+            padding: 10px;
+            background: var(--dark);
+            border-left: 3px solid var(--secondary);
+        }
+
+        /* MAIN POS INTERFACE */
+        .pos-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .pos-container.active {
+            display: block;
+        }
+
+        .pos-header {
+            background: var(--dark-light);
+            border-bottom: 3px solid var(--primary);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pos-title {
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pos-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .user-role {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-family: 'Saira Condensed', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary);
+            color: var(--text);
+        }
+
+        .pos-main {
+            display: grid;
+            grid-template-columns: 350px 1fr 350px;
+            height: calc(100vh - 85px);
+            gap: 0;
+        }
+
+        @media (max-width: 1200px) {
+            .pos-main {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        .pos-section {
+            background: var(--dark-light);
+            padding: 25px;
+            overflow-y: auto;
+            border-right: 2px solid var(--dark);
+        }
+
+        .pos-section:last-child {
+            border-right: none;
+        }
+
+        .section-title {
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            color: var(--secondary);
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--dark-lighter);
+            padding-bottom: 10px;
+        }
+
+        /* LEFT PANEL - MOVIES */
+        .movie-card {
+            background: var(--dark);
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .movie-card:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .movie-card.selected {
+            border-color: var(--secondary);
+            background: var(--dark-lighter);
+        }
+
+        .movie-title {
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .movie-info {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+        }
+
+        .showtimes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .showtime-btn {
+            padding: 8px 12px;
+            background: var(--dark-lighter);
+            border: 1px solid var(--dark-lighter);
+            color: var(--text);
+            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .showtime-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary);
+        }
+
+        .showtime-btn.selected {
+            background: var(--secondary);
+            color: var(--dark);
+            border-color: var(--secondary);
+            font-weight: 700;
+        }
+
+        /* CENTER PANEL - SEAT MAP */
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            background: var(--dark);
+        }
+
+        .screen {
+            width: 80%;
+            height: 40px;
+            background: linear-gradient(180deg, var(--secondary) 0%, transparent 100%);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dark);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .seat-map {
+            display: grid;
+            gap: 8px;
+        }
+
+        .seat-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .row-label {
+            width: 30px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 14px;
+        }
+
+        .seat {
+            width: 40px;
+            height: 40px;
+            background: var(--dark-lighter);
+            border: 2px solid var(--dark-lighter);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        .seat:hover:not(.occupied) {
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .seat.occupied {
+            background: var(--danger);
+            border-color: var(--danger);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .seat.selected {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        .seat-legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            font-size: 11px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid;
+        }
+
+        /* RIGHT PANEL - TARIFF */
+        .tariff-item {
+            background: var(--dark);
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid var(--dark-lighter);
+            transition: all 0.3s ease;
+        }
+
+        .tariff-item.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .tariff-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .tariff-name {
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .tariff-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .tariff-qty {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            background: var(--dark-lighter);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .qty-btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: var(--text);
+        }
+
+        .qty-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: var(--dark-lighter);
+        }
+
+        .qty-display {
+            width: 50px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .summary {
+            background: var(--dark-lighter);
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid var(--primary);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .summary-row.total {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--secondary);
+            border-top: 2px solid var(--dark);
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-action {
+            padding: 15px;
+            border: none;
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 2px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-clear:hover {
+            background: var(--danger);
+            color: var(--text);
+        }
+
+        .btn-pay {
+            background: var(--primary);
+            color: var(--text);
+        }
+
+        .btn-pay:hover:not(:disabled) {
+            background: var(--primary-dark);
+            box-shadow: 0 0 20px rgba(255, 0, 102, 0.5);
+        }
+
+        .btn-pay:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--dark-light);
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            border: 3px solid var(--primary);
+            position: relative;
+        }
+
+        .modal-title {
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            color: var(--secondary);
+        }
+
+        .payment-options, .document-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option-btn {
+            padding: 25px;
+            background: var(--dark);
+            border: 2px solid var(--dark-lighter);
+            color: var(--text);
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: var(--dark-lighter);
+        }
+
+        .option-btn.selected {
+            background: var(--secondary);
+            color: var(--dark);
+            border-color: var(--secondary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            border: 2px solid var(--text-dim);
+            color: var(--text-dim);
+        }
+
+        .btn-cancel:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
+
+        .btn-confirm {
+            background: var(--primary);
+            color: var(--text);
+        }
+
+        .btn-confirm:hover {
+            background: var(--primary-dark);
+        }
+
+        /* TICKET */
+        .ticket {
+            background: white;
+            color: #000;
+            padding: 30px;
+            max-width: 400px;
+            margin: 0 auto;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ticket-header {
+            text-align: center;
+            border-bottom: 2px dashed #000;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .ticket-cinema {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+
+        .ticket-row.large {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        .ticket-footer {
+            text-align: center;
+            border-top: 2px dashed #000;
+            padding-top: 15px;
+            margin-top: 15px;
+            font-size: 10px;
+        }
+
+        .ticket-barcode {
+            text-align: center;
+            font-size: 20px;
+            letter-spacing: 2px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn-print {
+            width: 100%;
+            padding: 15px;
+            background: var(--success);
+            border: none;
+            color: var(--dark);
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn-print:hover {
+            background: #00dd77;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+   
+
+    <!-- MAIN POS INTERFACE -->
+    <div class="pos-container" id="posScreen">
+        <div class="pos-header">
+            <div class="pos-title">CINEPOS / VENTA</div>
+            <div class="pos-user">
+                <div class="user-info">
+                    <div class="user-name" id="currentUser">Cajero</div>
+                    <div class="user-role">Punto de Venta #01</div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">SALIR</button>
+            </div>
+        </div>
+
+        <div class="pos-main">
+            <!-- LEFT PANEL: MOVIES -->
+            <div class="pos-section">
+                <div class="section-title">📽️ Películas en Cartelera</div>
+                <div id="moviesList"></div>
+            </div>
+
+            <!-- CENTER PANEL: SEAT MAP -->
+            <div class="pos-section center-panel">
+                <div class="section-title">Selección de Asientos</div>
+                <div id="seatMapContainer" style="display: none;">
+                    <div class="screen">PANTALLA</div>
+                    <div class="seat-map" id="seatMap"></div>
+                    <div class="seat-legend">
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: var(--dark-lighter); border-color: var(--dark-lighter);"></div>
+                            <span>Disponible</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: var(--secondary); border-color: var(--secondary);"></div>
+                            <span>Seleccionado</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: var(--danger); border-color: var(--danger); opacity: 0.5;"></div>
+                            <span>Ocupado</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="noSelectionMessage" style="text-align: center; color: var(--text-dim); padding: 50px 20px;">
+                    Seleccione una película y horario para ver el mapa de asientos
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: TARIFF & SUMMARY -->
+            <div class="pos-section">
+                <div class="section-title">🎫 Tarifas</div>
+                <div id="tariffList"></div>
+                
+                <div class="summary">
+                    <div class="summary-row">
+                        <span>Asientos:</span>
+                        <span id="seatCount">0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Entradas:</span>
+                        <span id="ticketCount">0</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>TOTAL:</span>
+                        <span id="totalAmount">S/ 0.00</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-action btn-clear" id="clearBtn">
+                        🗑️ Liberar Asientos
+                    </button>
+                    <button class="btn-action btn-pay" id="payBtn" disabled>
+                        💳 Procesar Pago
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <div class="modal-title">Método de Pago</div>
+            <div class="payment-options">
+                <button class="option-btn payment-option" data-payment="cash">
+                    💵 Efectivo
+                </button>
+                <button class="option-btn payment-option" data-payment="card">
+                    💳 Tarjeta
+                </button>
+            </div>
+            
+            <div class="modal-title" style="font-size: 24px; margin-top: 20px;">Tipo de Documento</div>
+            <div class="document-options">
+                <button class="option-btn document-option" data-document="boleta">
+                    📄 Boleta
+                </button>
+                <button class="option-btn document-option" data-document="factura">
+                    📋 Factura
+                </button>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelPayment">Cancelar</button>
+                <button class="btn-modal btn-confirm" id="confirmPayment">Confirmar Venta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TICKET MODAL -->
+    <div class="modal" id="ticketModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div id="ticketContent"></div>
+            <button class="btn-print" id="printBtn">🖨️ Imprimir Ticket</button>
+            <button class="btn-modal btn-confirm" id="newSaleBtn" style="width: 100%; margin-top: 15px;">
+                Nueva Venta
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DATA ====================
+        const movies = [
+            {
+                id: 1,
+                title: 'Avatar: El Camino del Agua',
+                duration: '192 min',
+                genre: 'Ciencia Ficción',
+                rating: 'PG-13',
+                showtimes: ['10:00', '13:30', '17:00', '20:30']
+            },
+            {
+                id: 2,
+                title: 'Fast X',
+                duration: '141 min',
+                genre: 'Acción',
+                rating: 'PG-13',
+                showtimes: ['11:00', '14:00', '18:30', '21:30']
+            },
+            {
+                id: 3,
+                title: 'Guardianes de la Galaxia Vol. 3',
+                duration: '150 min',
+                genre: 'Aventura',
+                rating: 'PG-13',
+                showtimes: ['12:00', '15:30', '19:00', '22:00']
+            },
+            {
+                id: 4,
+                title: 'El Exorcista: Creyentes',
+                duration: '111 min',
+                genre: 'Terror',
+                rating: 'R',
+                showtimes: ['13:00', '16:00', '19:30', '22:30']
+            }
+        ];
+
+        const tariffs = [
+            { id: 1, name: 'General', price: 15.00 },
+            { id: 2, name: 'Niño', price: 10.00 },
+            { id: 3, name: 'Adulto Mayor', price: 8.00 },
+            { id: 4, name: 'Estudiante', price: 12.00 }
+        ];
+
+        // ==================== STATE ====================
+        let currentUser = '';
+        let selectedMovie = null;
+        let selectedShowtime = null;
+        let selectedSeats = [];
+        let occupiedSeatsData = {}; // Almacena asientos ocupados por película+horario
+        let tariffQuantities = { 1: 0, 2: 0, 3: 0, 4: 0 };
+        let paymentMethod = null;
+        let documentType = null;
+   
+
+       
+
+        // ==================== INITIALIZE POS ====================
+        function initializePOS() {
+            renderMovies();
+            renderTariffs();
+            generateAllOccupiedSeats();
+        }
+
+        function generateAllOccupiedSeats() {
+            // Generar asientos ocupados únicos para cada película + horario
+            occupiedSeatsData = {};
+            
+            movies.forEach(movie => {
+                movie.showtimes.forEach(showtime => {
+                    const key = `${movie.id}-${showtime}`;
+                    occupiedSeatsData[key] = generateRandomSeats();
+                });
+            });
+        }
+
+        function generateRandomSeats() {
+            const seats = [];
+            const rows = ['A', 'B', 'C', 'D', 'E', 'F'];
+            // Entre 10 y 20 asientos ocupados por sala
+            const numOccupied = Math.floor(Math.random() * 11) + 10;
+            
+            for (let i = 0; i < numOccupied; i++) {
+                const row = rows[Math.floor(Math.random() * rows.length)];
+                const seat = Math.floor(Math.random() * 10) + 1;
+                const seatId = `${row}${seat}`;
+                if (!seats.includes(seatId)) {
+                    seats.push(seatId);
+                }
+            }
+            return seats;
+        }
+
+        function getCurrentOccupiedSeats() {
+            if (!selectedMovie || !selectedShowtime) return [];
+            const key = `${selectedMovie}-${selectedShowtime}`;
+            return occupiedSeatsData[key] || [];
+        }
+
+        // ==================== RENDER MOVIES ====================
+        function renderMovies() {
+            const container = document.getElementById('moviesList');
+            container.innerHTML = movies.map(movie => `
+                <div class="movie-card" data-id="${movie.id}">
+                    <div class="movie-title">${movie.title}</div>
+                    <div class="movie-info">${movie.genre} • ${movie.duration} • ${movie.rating}</div>
+                    <div class="showtimes">
+                        ${movie.showtimes.map(time => `
+                            <button class="showtime-btn" data-movie="${movie.id}" data-time="${time}">
+                                ${time}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.showtime-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const movieId = parseInt(btn.dataset.movie);
+                    const showtime = btn.dataset.time;
+                    selectMovieShowtime(movieId, showtime);
+                });
+            });
+        }
+
+        function selectMovieShowtime(movieId, showtime) {
+            if ((selectedMovie !== movieId || selectedShowtime !== showtime) && selectedSeats.length > 0) {
+                if (!confirm('Tiene asientos seleccionados. ¿Desea liberarlos y cambiar de función?')) {
+                    return;
+                }
+                clearSelection();
+            }
+
+            selectedMovie = movieId;
+            selectedShowtime = showtime;
+
+            document.querySelectorAll('.movie-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`.movie-card[data-id="${movieId}"]`).classList.add('selected');
+
+            document.querySelectorAll('.showtime-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`.showtime-btn[data-movie="${movieId}"][data-time="${showtime}"]`).classList.add('selected');
+
+            renderSeatMap();
+        }
+
+        // ==================== RENDER SEAT MAP ====================
+        function renderSeatMap() {
+            document.getElementById('noSelectionMessage').style.display = 'none';
+            document.getElementById('seatMapContainer').style.display = 'block';
+
+            const rows = ['A', 'B', 'C', 'D', 'E', 'F'];
+            const seatsPerRow = 10;
+            const occupiedSeats = getCurrentOccupiedSeats();
+            
+            const seatMap = document.getElementById('seatMap');
+            seatMap.innerHTML = rows.map(row => `
+                <div class="seat-row">
+                    <div class="row-label">${row}</div>
+                    ${Array.from({ length: seatsPerRow }, (_, i) => {
+                        const seatNumber = i + 1;
+                        const seatId = `${row}${seatNumber}`;
+                        const isOccupied = occupiedSeats.includes(seatId);
+                        const isSelected = selectedSeats.includes(seatId);
+                        
+                        return `
+                            <div class="seat ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}"
+                                 data-seat="${seatId}">
+                                ${seatNumber}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.seat:not(.occupied)').forEach(seat => {
+                seat.addEventListener('click', () => {
+                    toggleSeat(seat.dataset.seat);
+                });
+            });
+        }
+
+        function toggleSeat(seatId) {
+            const index = selectedSeats.indexOf(seatId);
+            if (index > -1) {
+                selectedSeats.splice(index, 1);
+            } else {
+                selectedSeats.push(seatId);
+            }
+            renderSeatMap();
+            updateTariffState();
+            updateSummary();
+        }
+
+        // ==================== RENDER TARIFFS ====================
+        function renderTariffs() {
+            const container = document.getElementById('tariffList');
+            container.innerHTML = tariffs.map(tariff => `
+                <div class="tariff-item" id="tariff-${tariff.id}">
+                    <div class="tariff-header">
+                        <div class="tariff-name">${tariff.name}</div>
+                        <div class="tariff-price">S/ ${tariff.price.toFixed(2)}</div>
+                    </div>
+                    <div class="tariff-qty">
+                        <button class="qty-btn" data-tariff="${tariff.id}" data-action="decrease">-</button>
+                        <div class="qty-display" id="qty-${tariff.id}">0</div>
+                        <button class="qty-btn" data-tariff="${tariff.id}" data-action="increase">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.qty-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tariffId = parseInt(btn.dataset.tariff);
+                    const action = btn.dataset.action;
+                    if (action === 'increase') {
+                        increaseTariff(tariffId);
+                    } else {
+                        decreaseTariff(tariffId);
+                    }
+                });
+            });
+        }
+
+        function updateTariffState() {
+            const totalSeats = selectedSeats.length;
+            tariffs.forEach(tariff => {
+                const item = document.getElementById(`tariff-${tariff.id}`);
+                if (totalSeats === 0) {
+                    item.classList.add('disabled');
+                } else {
+                    item.classList.remove('disabled');
+                }
+            });
+        }
+
+        function increaseTariff(tariffId) {
+            const totalSeats = selectedSeats.length;
+            const totalTickets = Object.values(tariffQuantities).reduce((a, b) => a + b, 0);
+            
+            if (totalTickets < totalSeats) {
+                tariffQuantities[tariffId]++;
+                document.getElementById(`qty-${tariffId}`).textContent = tariffQuantities[tariffId];
+                updateSummary();
+            } else {
+                alert('No puede asignar más tarifas que asientos seleccionados');
+            }
+        }
+
+        function decreaseTariff(tariffId) {
+            if (tariffQuantities[tariffId] > 0) {
+                tariffQuantities[tariffId]--;
+                document.getElementById(`qty-${tariffId}`).textContent = tariffQuantities[tariffId];
+                updateSummary();
+            }
+        }
+
+        // ==================== UPDATE SUMMARY ====================
+        function updateSummary() {
+            const totalSeats = selectedSeats.length;
+            const totalTickets = Object.values(tariffQuantities).reduce((a, b) => a + b, 0);
+            
+            let total = 0;
+            tariffs.forEach(tariff => {
+                total += tariff.price * tariffQuantities[tariff.id];
+            });
+
+            document.getElementById('seatCount').textContent = totalSeats;
+            document.getElementById('ticketCount').textContent = totalTickets;
+            document.getElementById('totalAmount').textContent = `S/ ${total.toFixed(2)}`;
+
+            const payBtn = document.getElementById('payBtn');
+            if (totalSeats > 0 && totalSeats === totalTickets) {
+                payBtn.disabled = false;
+            } else {
+                payBtn.disabled = true;
+            }
+        }
+
+        // ==================== CLEAR SELECTION ====================
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            if (selectedSeats.length > 0) {
+                if (confirm('¿Desea liberar todos los asientos seleccionados?')) {
+                    clearSelection();
+                }
+            }
+        });
+
+        function clearSelection() {
+            selectedSeats = [];
+            tariffQuantities = { 1: 0, 2: 0, 3: 0, 4: 0 };
+            tariffs.forEach(tariff => {
+                document.getElementById(`qty-${tariff.id}`).textContent = '0';
+            });
+            if (selectedMovie && selectedShowtime) {
+                renderSeatMap();
+            }
+            updateSummary();
+        }
+
+        // ==================== PAYMENT PROCESS ====================
+        document.getElementById('payBtn').addEventListener('click', () => {
+            paymentMethod = null;
+            documentType = null;
+            document.getElementById('paymentModal').classList.add('active');
+            
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        });
+
+        document.querySelectorAll('.payment-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.payment-option').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                paymentMethod = btn.dataset.payment;
+            });
+        });
+
+        document.querySelectorAll('.document-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.document-option').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                documentType = btn.dataset.document;
+            });
+        });
+
+        document.getElementById('cancelPayment').addEventListener('click', () => {
+            document.getElementById('paymentModal').classList.remove('active');
+        });
+
+        document.getElementById('confirmPayment').addEventListener('click', () => {
+            if (!paymentMethod || !documentType) {
+                alert('Por favor seleccione método de pago y tipo de documento');
+                return;
+            }
+
+            document.getElementById('paymentModal').classList.remove('active');
+            generateTicket();
+        });
+
+        // ==================== GENERATE TICKET ====================
+        function generateTicket() {
+            const movie = movies.find(m => m.id === selectedMovie);
+            const totalSeats = selectedSeats.length;
+            let total = 0;
+            
+            let ticketDetails = '';
+            tariffs.forEach(tariff => {
+                if (tariffQuantities[tariff.id] > 0) {
+                    const subtotal = tariff.price * tariffQuantities[tariff.id];
+                    total += subtotal;
+                    ticketDetails += `
+                        <div class="ticket-row">
+                            <span>${tariffQuantities[tariff.id]}x ${tariff.name}</span>
+                            <span>S/ ${subtotal.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            const now = new Date();
+            const ticketNumber = 'T' + now.getTime().toString().slice(-8);
+            const barcode = '|||  ||  |  ||  |||  |  ||  |||';
+
+            const ticketHTML = `
+                <div class="ticket">
+                    <div class="ticket-header">
+                        <div class="ticket-cinema">CINEPOS</div>
+                        <div style="font-size: 10px;">Sistema de Venta de Entradas</div>
+                    </div>
+                    
+                    <div class="ticket-row large">
+                        <span>PELÍCULA:</span>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 10px; font-weight: 700;">
+                        ${movie.title}
+                    </div>
+                    
+                    <div class="ticket-row">
+                        <span>Fecha:</span>
+                        <span>${now.toLocaleDateString('es-PE')}</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span>Hora:</span>
+                        <span>${selectedShowtime}</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span>Sala:</span>
+                        <span>SALA ${selectedMovie}</span>
+                    </div>
+                    <div class="ticket-row large">
+                        <span>Asientos:</span>
+                        <span>${selectedSeats.sort().join(', ')}</span>
+                    </div>
+                    
+                    <div style="border-top: 1px dashed #000; margin: 15px 0; padding-top: 15px;">
+                        ${ticketDetails}
+                    </div>
+                    
+                    <div class="ticket-row large" style="border-top: 2px solid #000; padding-top: 10px;">
+                        <span>TOTAL:</span>
+                        <span>S/ ${total.toFixed(2)}</span>
+                    </div>
+                    
+                    <div class="ticket-row" style="margin-top: 15px;">
+                        <span>Pago:</span>
+                        <span>${paymentMethod === 'cash' ? 'EFECTIVO' : 'TARJETA'}</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span>Documento:</span>
+                        <span>${documentType === 'boleta' ? 'BOLETA' : 'FACTURA'}</span>
+                    </div>
+                    
+                    <div class="ticket-barcode">${barcode}</div>
+                    
+                    <div class="ticket-footer">
+                        <div>Ticket N°: ${ticketNumber}</div>
+                        <div>Cajero: ${currentUser}</div>
+                        <div>${now.toLocaleString('es-PE')}</div>
+                        <div style="margin-top: 10px;">¡Disfruta la función!</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('ticketContent').innerHTML = ticketHTML;
+            document.getElementById('ticketModal').classList.add('active');
+
+            // Marcar asientos como ocupados en la sala específica
+            const key = `${selectedMovie}-${selectedShowtime}`;
+            selectedSeats.forEach(seat => {
+                if (!occupiedSeatsData[key].includes(seat)) {
+                    occupiedSeatsData[key].push(seat);
+                }
+            });
+        }
+
+        document.getElementById('printBtn').addEventListener('click', () => {
+            window.print();
+        });
+
+        document.getElementById('newSaleBtn').addEventListener('click', () => {
+            document.getElementById('ticketModal').classList.remove('active');
+            resetPOS();
+        });
+
+        function resetPOS() {
+            selectedMovie = null;
+            selectedShowtime = null;
+            selectedSeats = [];
+            tariffQuantities = { 1: 0, 2: 0, 3: 0, 4: 0 };
+            paymentMethod = null;
+            documentType = null;
+
+            document.querySelectorAll('.movie-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelectorAll('.showtime-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            tariffs.forEach(tariff => {
+                document.getElementById(`qty-${tariff.id}`).textContent = '0';
+            });
+
+            document.getElementById('seatMapContainer').style.display = 'none';
+            document.getElementById('noSelectionMessage').style.display = 'block';
+            
+            updateSummary();
+        }
+    </script>
+</body>
+</html>

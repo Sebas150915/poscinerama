@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChocoPOS - Sistema de Venta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --chocolate: #3e2723;
+            --chocolate-light: #5d4037;
+            --chocolate-dark: #1b0000;
+            --cream: #fdf6e3;
+            --cream-dark: #f4e7d0;
+            --gold: #d4af37;
+            --gold-light: #f4d03f;
+            --bronze: #cd7f32;
+            --text-dark: #2c1810;
+            --text-light: #8d6e63;
+            --white: #ffffff;
+            --success: #2e7d32;
+            --danger: #c62828;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--cream-dark) 100%);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* LOGIN SCREEN */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: 
+                linear-gradient(135deg, rgba(62, 39, 35, 0.05) 0%, rgba(212, 175, 55, 0.1) 100%),
+                var(--cream);
+            position: relative;
+        }
+
+        .login-container::before {
+            content: '🍫';
+            position: absolute;
+            font-size: 200px;
+            opacity: 0.05;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .login-box {
+            background: var(--white);
+            padding: 60px 50px;
+            border-radius: 20px;
+            box-shadow: 
+                0 20px 60px rgba(62, 39, 35, 0.15),
+                0 0 0 1px rgba(212, 175, 55, 0.1);
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 48px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--chocolate);
+            letter-spacing: 2px;
+        }
+
+        .login-logo::before {
+            content: '🍿';
+            display: block;
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 13px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--chocolate);
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            background: var(--cream);
+            border: 2px solid transparent;
+            color: var(--text-dark);
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--chocolate) 0%, var(--chocolate-light) 100%);
+            border: none;
+            color: var(--white);
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(62, 39, 35, 0.3);
+        }
+
+        .login-hint {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 11px;
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--cream);
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
+        }
+
+        /* MAIN POS INTERFACE */
+        .pos-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .pos-container.active {
+            display: block;
+        }
+
+        .pos-header {
+            background: linear-gradient(135deg, var(--chocolate) 0%, var(--chocolate-light) 100%);
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(62, 39, 35, 0.2);
+        }
+
+        .pos-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: 2px;
+        }
+
+        .pos-title::before {
+            content: '🍿 ';
+        }
+
+        .pos-user {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gold);
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--cream);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logout-btn {
+            padding: 12px 24px;
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--gold);
+            color: var(--chocolate);
+        }
+
+        .pos-main {
+            display: grid;
+            grid-template-columns: 60% 40%;
+            height: calc(100vh - 95px);
+            gap: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .pos-main {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        /* LEFT PANEL - PRODUCTS */
+        .products-panel {
+            background: var(--cream);
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .category-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--chocolate);
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--chocolate);
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 4px 15px rgba(62, 39, 35, 0.08);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.2);
+        }
+
+        .product-emoji {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .product-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--chocolate);
+            text-align: center;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gold);
+            text-align: center;
+        }
+
+        /* RIGHT PANEL - CART */
+        .cart-panel {
+            background: var(--white);
+            padding: 30px;
+            overflow-y: auto;
+            border-left: 3px solid var(--gold);
+            box-shadow: -10px 0 30px rgba(62, 39, 35, 0.1);
+        }
+
+        .cart-empty {
+            text-align: center;
+            color: var(--text-light);
+            padding: 60px 20px;
+            font-style: italic;
+        }
+
+        .cart-empty::before {
+            content: '🛒';
+            display: block;
+            font-size: 80px;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        .cart-items {
+            margin-bottom: 25px;
+        }
+
+        .cart-item {
+            background: var(--cream);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .cart-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            color: var(--chocolate);
+            font-size: 15px;
+        }
+
+        .cart-item-remove {
+            background: var(--danger);
+            color: var(--white);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .cart-item-remove:hover {
+            transform: scale(1.1);
+        }
+
+        .cart-item-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            background: var(--chocolate);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        .qty-btn:hover {
+            background: var(--chocolate-light);
+        }
+
+        .qty-display {
+            width: 40px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--chocolate);
+        }
+
+        .cart-item-price {
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 16px;
+        }
+
+        /* DOCUMENT SECTION */
+        .document-section {
+            background: var(--cream-dark);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .document-title {
+            font-weight: 600;
+            color: var(--chocolate);
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .document-type-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .doc-type-btn {
+            padding: 12px;
+            background: var(--white);
+            border: 2px solid var(--cream);
+            color: var(--chocolate);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .doc-type-btn:hover {
+            border-color: var(--gold);
+        }
+
+        .doc-type-btn.selected {
+            background: var(--chocolate);
+            color: var(--gold);
+            border-color: var(--chocolate);
+        }
+
+        .document-input-group {
+            margin-bottom: 12px;
+        }
+
+        .document-input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--chocolate);
+            font-weight: 600;
+        }
+
+        .document-input-group input {
+            width: 100%;
+            padding: 12px;
+            background: var(--white);
+            border: 2px solid var(--cream);
+            color: var(--text-dark);
+            font-family: 'Raleway', sans-serif;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .document-input-group input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        /* SUMMARY */
+        .cart-summary {
+            background: var(--cream-dark);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .summary-row.total {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--chocolate);
+            border-top: 2px solid var(--gold);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .summary-row.total .amount {
+            color: var(--gold);
+        }
+
+        /* PAYMENT SECTION */
+        .payment-section {
+            background: var(--cream-dark);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .payment-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .payment-btn {
+            padding: 15px;
+            background: var(--white);
+            border: 2px solid var(--cream);
+            color: var(--chocolate);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .payment-btn:hover {
+            border-color: var(--gold);
+        }
+
+        .payment-btn.selected {
+            background: var(--chocolate);
+            color: var(--gold);
+            border-color: var(--chocolate);
+        }
+
+        /* ACTION BUTTONS */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-action {
+            padding: 18px;
+            border: none;
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            border-radius: 8px;
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 2px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-clear:hover {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-pay {
+            background: linear-gradient(135deg, var(--chocolate) 0%, var(--chocolate-light) 100%);
+            color: var(--gold);
+            box-shadow: 0 4px 15px rgba(62, 39, 35, 0.3);
+        }
+
+        .btn-pay:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(62, 39, 35, 0.4);
+        }
+
+        .btn-pay:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(62, 39, 35, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        /* TICKET */
+        .ticket {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 30px;
+            max-width: 400px;
+            margin: 0 auto;
+            font-family: 'Courier New', monospace;
+            border: 2px dashed var(--chocolate);
+            border-radius: 10px;
+        }
+
+        .ticket-header {
+            text-align: center;
+            border-bottom: 2px dashed var(--chocolate);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .ticket-shop {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--chocolate);
+        }
+
+        .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+
+        .ticket-row.large {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        .ticket-footer {
+            text-align: center;
+            border-top: 2px dashed var(--chocolate);
+            padding-top: 15px;
+            margin-top: 15px;
+            font-size: 10px;
+            color: var(--text-light);
+        }
+
+        .ticket-barcode {
+            text-align: center;
+            font-size: 20px;
+            letter-spacing: 2px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn-print {
+            width: 100%;
+            padding: 15px;
+            background: var(--chocolate);
+            border: none;
+            color: var(--gold);
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 8px;
+            letter-spacing: 1px;
+        }
+
+        .btn-print:hover {
+            background: var(--chocolate-light);
+        }
+
+        .btn-new-sale {
+            width: 100%;
+            padding: 15px;
+            background: var(--gold);
+            border: none;
+            color: var(--chocolate);
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 8px;
+            letter-spacing: 1px;
+        }
+
+        .btn-new-sale:hover {
+            background: var(--gold-light);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--cream);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--chocolate);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold);
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .ticket, .ticket * {
+                visibility: visible;
+            }
+            .ticket {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+            .btn-print, .btn-new-sale {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-box">
+            <div class="login-logo">CineSnacks</div>
+            <div class="login-subtitle">Confitería de Cine</div>
+            <div class="input-group">
+                <label>Usuario</label>
+                <input type="text" id="username" value="vendedor">
+            </div>
+            <div class="input-group">
+                <label>Contraseña</label>
+                <input type="password" id="password" value="1234">
+            </div>
+            <button class="login-btn" id="loginBtn">Acceder al Sistema</button>
+            <div class="login-hint">
+                💡 Usuario: vendedor | Contraseña: 1234<br>
+                (o escribe cualquier combinación)
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN POS INTERFACE -->
+    <div class="pos-container" id="posScreen">
+        <div class="pos-header">
+            <div class="pos-title">CineSnacks POS</div>
+            <div class="pos-user">
+                <div class="user-info">
+                    <div class="user-name" id="currentUser">Vendedor</div>
+                    <div class="user-role">Confitería - Punto de Venta</div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Salir</button>
+            </div>
+        </div>
+
+        <div class="pos-main">
+            <!-- LEFT PANEL: PRODUCTS -->
+            <div class="products-panel">
+                <div class="section-title">🍿 Menú de Confitería</div>
+                <div id="productsContainer"></div>
+            </div>
+
+            <!-- RIGHT PANEL: CART -->
+            <div class="cart-panel">
+                <div class="section-title">Carrito de Compra</div>
+                
+                <div id="cartEmpty" class="cart-empty">
+                    Selecciona productos para comenzar
+                </div>
+
+                <div id="cartContent" style="display: none;">
+                    <div class="cart-items" id="cartItems"></div>
+
+                    <!-- DOCUMENT SECTION -->
+                    <div class="document-section">
+                        <div class="document-title">📄 Tipo de Comprobante</div>
+                        <div class="document-type-buttons">
+                            <button class="doc-type-btn" data-type="boleta">Boleta</button>
+                            <button class="doc-type-btn" data-type="factura">Factura</button>
+                        </div>
+                        <div class="document-input-group" id="documentNumberGroup" style="display: none;">
+                            <label id="documentLabel">DNI / RUC</label>
+                            <input type="text" id="documentNumber" placeholder="Ingrese número">
+                        </div>
+                    </div>
+
+                    <!-- SUMMARY -->
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">S/ 0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>IGV (18%):</span>
+                            <span id="igv">S/ 0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>TOTAL:</span>
+                            <span class="amount" id="total">S/ 0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- PAYMENT SECTION -->
+                    <div class="payment-section">
+                        <div class="document-title">💳 Forma de Pago</div>
+                        <div class="payment-buttons">
+                            <button class="payment-btn" data-payment="efectivo">
+                                💵 Efectivo
+                            </button>
+                            <button class="payment-btn" data-payment="visa">
+                                💳 Visa
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="action-buttons">
+                        <button class="btn-action btn-clear" id="clearBtn">
+                            🗑️ Limpiar Carrito
+                        </button>
+                        <button class="btn-action btn-pay" id="payBtn" disabled>
+                            ✓ Procesar Venta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TICKET MODAL -->
+    <div class="modal" id="ticketModal">
+        <div class="modal-content">
+            <div id="ticketContent"></div>
+            <button class="btn-print" id="printBtn">🖨️ Imprimir Ticket</button>
+            <button class="btn-new-sale" id="newSaleBtn">Nueva Venta</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DATA ====================
+        const products = [
+            // COMBOS
+            { id: 1, name: 'Combo Familiar', emoji: '🍿', price: 45.00, category: 'combos' },
+            { id: 2, name: 'Combo Duo', emoji: '🎬', price: 28.00, category: 'combos' },
+            { id: 3, name: 'Combo Personal', emoji: '🥤', price: 18.00, category: 'combos' },
+            { id: 4, name: 'Combo Premium', emoji: '👑', price: 55.00, category: 'combos' },
+            
+            // GASEOSAS
+            { id: 5, name: 'Coca Cola Grande', emoji: '🥤', price: 8.00, category: 'bebidas' },
+            { id: 6, name: 'Coca Cola Mediana', emoji: '🥤', price: 6.00, category: 'bebidas' },
+            { id: 7, name: 'Inca Kola Grande', emoji: '🟡', price: 8.00, category: 'bebidas' },
+            { id: 8, name: 'Sprite Grande', emoji: '💚', price: 8.00, category: 'bebidas' },
+            { id: 9, name: 'Agua Mineral', emoji: '💧', price: 4.00, category: 'bebidas' },
+            
+            // CANCHITA/POPCORN
+            { id: 10, name: 'Canchita Grande', emoji: '🍿', price: 12.00, category: 'snacks' },
+            { id: 11, name: 'Canchita Mediana', emoji: '🍿', price: 9.00, category: 'snacks' },
+            { id: 12, name: 'Canchita Caramelo', emoji: '🧈', price: 10.00, category: 'snacks' },
+            { id: 13, name: 'Canchita Mantequilla', emoji: '🧈', price: 10.00, category: 'snacks' },
+            
+            // DULCES Y SNACKS
+            { id: 14, name: 'M&Ms', emoji: '🍬', price: 6.00, category: 'dulces' },
+            { id: 15, name: 'Skittles', emoji: '🌈', price: 6.00, category: 'dulces' },
+            { id: 16, name: 'Snickers', emoji: '🍫', price: 5.00, category: 'dulces' },
+            { id: 17, name: 'Kit Kat', emoji: '🍫', price: 5.00, category: 'dulces' },
+            { id: 18, name: 'Nachos con Queso', emoji: '🧀', price: 12.00, category: 'snacks' },
+            { id: 19, name: 'Hot Dog', emoji: '🌭', price: 10.00, category: 'snacks' },
+            
+            // CHOCOLATES ARTESANALES
+            { id: 20, name: 'Trufa Clásica', emoji: '🍫', price: 3.50, category: 'chocolates' },
+            { id: 21, name: 'Bombón de Almendras', emoji: '🥜', price: 4.00, category: 'chocolates' },
+            { id: 22, name: 'Chocolate Premium', emoji: '⬛', price: 6.00, category: 'chocolates' },
+            { id: 23, name: 'Caja de Chocolates', emoji: '🎁', price: 25.00, category: 'chocolates' }
+        ];
+
+        // ==================== STATE ====================
+        let currentUser = '';
+        let cart = [];
+        let documentType = null;
+        let paymentMethod = null;
+
+        // ==================== LOGIN ====================
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username.trim() && password.trim()) {
+                currentUser = username;
+                document.getElementById('currentUser').textContent = username;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('posScreen').classList.add('active');
+                initializePOS();
+            } else {
+                alert('Por favor ingrese usuario y contraseña');
+            }
+        });
+
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginBtn').click();
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (confirm('¿Está seguro que desea cerrar sesión?')) {
+                location.reload();
+            }
+        });
+
+        // ==================== INITIALIZE POS ====================
+        function initializePOS() {
+            renderProducts();
+            setupEventListeners();
+        }
+
+        function renderProducts() {
+            const categories = {
+                'combos': { title: '🎬 Combos Especiales', emoji: '🎬' },
+                'bebidas': { title: '🥤 Bebidas', emoji: '🥤' },
+                'snacks': { title: '🍿 Snacks', emoji: '🍿' },
+                'dulces': { title: '🍬 Dulces', emoji: '🍬' },
+                'chocolates': { title: '🍫 Chocolates Premium', emoji: '🍫' }
+            };
+
+            const container = document.getElementById('productsContainer');
+            let html = '';
+
+            Object.keys(categories).forEach(categoryKey => {
+                const categoryProducts = products.filter(p => p.category === categoryKey);
+                if (categoryProducts.length > 0) {
+                    html += `
+                        <div class="category-section">
+                            <div class="category-title">${categories[categoryKey].title}</div>
+                            <div class="products-grid">
+                                ${categoryProducts.map(product => `
+                                    <div class="product-card" data-id="${product.id}">
+                                        <div class="product-emoji">${product.emoji}</div>
+                                        <div class="product-name">${product.name}</div>
+                                        <div class="product-price">S/ ${product.price.toFixed(2)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    addToCart(parseInt(card.dataset.id));
+                });
+            });
+        }
+
+        function setupEventListeners() {
+            // Document type buttons
+            document.querySelectorAll('.doc-type-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.doc-type-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    documentType = btn.dataset.type;
+                    
+                    const docGroup = document.getElementById('documentNumberGroup');
+                    const docLabel = document.getElementById('documentLabel');
+                    
+                    if (documentType === 'factura') {
+                        docGroup.style.display = 'block';
+                        docLabel.textContent = 'RUC';
+                        document.getElementById('documentNumber').placeholder = 'Ingrese RUC (11 dígitos)';
+                    } else {
+                        docGroup.style.display = 'block';
+                        docLabel.textContent = 'DNI';
+                        document.getElementById('documentNumber').placeholder = 'Ingrese DNI (8 dígitos)';
+                    }
+                    
+                    updatePayButton();
+                });
+            });
+
+            // Payment method buttons
+            document.querySelectorAll('.payment-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    paymentMethod = btn.dataset.payment;
+                    updatePayButton();
+                });
+            });
+
+            // Document number input
+            document.getElementById('documentNumber').addEventListener('input', () => {
+                updatePayButton();
+            });
+
+            // Clear cart
+            document.getElementById('clearBtn').addEventListener('click', () => {
+                if (cart.length > 0 && confirm('¿Desea limpiar el carrito?')) {
+                    clearCart();
+                }
+            });
+
+            // Process payment
+            document.getElementById('payBtn').addEventListener('click', () => {
+                processPayment();
+            });
+
+            // Print ticket
+            document.getElementById('printBtn').addEventListener('click', () => {
+                window.print();
+            });
+
+            // New sale
+            document.getElementById('newSaleBtn').addEventListener('click', () => {
+                document.getElementById('ticketModal').classList.remove('active');
+                clearCart();
+            });
+        }
+
+        // ==================== CART MANAGEMENT ====================
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1
+                });
+            }
+
+            renderCart();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            renderCart();
+        }
+
+        function updateQuantity(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    renderCart();
+                }
+            }
+        }
+
+        function clearCart() {
+            cart = [];
+            documentType = null;
+            paymentMethod = null;
+            document.getElementById('documentNumber').value = '';
+            document.querySelectorAll('.doc-type-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('documentNumberGroup').style.display = 'none';
+            renderCart();
+        }
+
+        function renderCart() {
+            if (cart.length === 0) {
+                document.getElementById('cartEmpty').style.display = 'block';
+                document.getElementById('cartContent').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('cartEmpty').style.display = 'none';
+            document.getElementById('cartContent').style.display = 'block';
+
+            const container = document.getElementById('cartItems');
+            container.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-header">
+                        <div class="cart-item-name">${item.name}</div>
+                        <button class="cart-item-remove" onclick="removeFromCart(${item.id})">×</button>
+                    </div>
+                    <div class="cart-item-controls">
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                            <div class="qty-display">${item.quantity}</div>
+                            <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                        </div>
+                        <div class="cart-item-price">S/ ${(item.price * item.quantity).toFixed(2)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const igv = subtotal * 0.18;
+            const total = subtotal + igv;
+
+            document.getElementById('subtotal').textContent = `S/ ${subtotal.toFixed(2)}`;
+            document.getElementById('igv').textContent = `S/ ${igv.toFixed(2)}`;
+            document.getElementById('total').textContent = `S/ ${total.toFixed(2)}`;
+
+            updatePayButton();
+        }
+
+        function updatePayButton() {
+            const payBtn = document.getElementById('payBtn');
+            const docNumber = document.getElementById('documentNumber').value;
+            
+            const isValid = cart.length > 0 && 
+                          documentType && 
+                          paymentMethod && 
+                          docNumber.trim() !== '';
+
+            payBtn.disabled = !isValid;
+        }
+
+        // ==================== PAYMENT ====================
+        function processPayment() {
+            const docNumber = document.getElementById('documentNumber').value;
+            
+            if (documentType === 'factura' && docNumber.length !== 11) {
+                alert('El RUC debe tener 11 dígitos');
+                return;
+            }
+            
+            if (documentType === 'boleta' && docNumber.length !== 8) {
+                alert('El DNI debe tener 8 dígitos');
+                return;
+            }
+
+            generateTicket();
+        }
+
+        function generateTicket() {
+            const now = new Date();
+            const ticketNumber = 'CH' + now.getTime().toString().slice(-8);
+            const barcode = '|||  ||  |  ||  |||  |  ||  |||';
+            
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const igv = subtotal * 0.18;
+            const total = subtotal + igv;
+
+            const docNumber = document.getElementById('documentNumber').value;
+
+            let itemsHTML = '';
+            cart.forEach(item => {
+                itemsHTML += `
+                    <div class="ticket-row">
+                        <span>${item.quantity}x ${item.name}</span>
+                        <span>S/ ${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            const ticketHTML = `
+                <div class="ticket">
+                    <div class="ticket-header">
+                        <div class="ticket-shop">🍿 CineSnacks</div>
+                        <div style="font-size: 11px;">Confitería de Cine</div>
+                        <div style="font-size: 10px; margin-top: 5px;">RUC: 20123456789</div>
+                    </div>
+                    
+                    <div class="ticket-row">
+                        <span>Fecha:</span>
+                        <span>${now.toLocaleDateString('es-PE')}</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span>Hora:</span>
+                        <span>${now.toLocaleTimeString('es-PE')}</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span>Cajero:</span>
+                        <span>${currentUser}</span>
+                    </div>
+                    
+                    <div style="border-top: 1px dashed #3e2723; margin: 15px 0; padding-top: 15px;">
+                        <div class="ticket-row large">
+                            <span>${documentType === 'factura' ? 'FACTURA' : 'BOLETA'}</span>
+                        </div>
+                        <div class="ticket-row">
+                            <span>${documentType === 'factura' ? 'RUC' : 'DNI'}:</span>
+                            <span>${docNumber}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="border-top: 1px dashed #3e2723; margin: 15px 0; padding-top: 15px;">
+                        ${itemsHTML}
+                    </div>
+                    
+                    <div class="ticket-row">
+                        <span>Subtotal:</span>
+                        <span>S/ ${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span>IGV (18%):</span>
+                        <span>S/ ${igv.toFixed(2)}</span>
+                    </div>
+                    <div class="ticket-row large" style="border-top: 2px solid #3e2723; padding-top: 10px;">
+                        <span>TOTAL:</span>
+                        <span>S/ ${total.toFixed(2)}</span>
+                    </div>
+                    
+                    <div class="ticket-row" style="margin-top: 15px;">
+                        <span>Pago:</span>
+                        <span>${paymentMethod === 'efectivo' ? 'EFECTIVO' : 'VISA'}</span>
+                    </div>
+                    
+                    <div class="ticket-barcode">${barcode}</div>
+                    
+                    <div class="ticket-footer">
+                        <div>Ticket N°: ${ticketNumber}</div>
+                        <div style="margin-top: 10px;">¡Gracias por su compra!</div>
+                        <div>Disfruta tu función 🎬</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('ticketContent').innerHTML = ticketHTML;
+            document.getElementById('ticketModal').classList.add('active');
+        }
+    </script>
+</body>
+</html>
