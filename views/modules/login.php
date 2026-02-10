@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,7 +41,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: 
+            background:
                 radial-gradient(circle at 20% 50%, rgba(255, 0, 102, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(0, 255, 204, 0.1) 0%, transparent 50%),
                 var(--dark);
@@ -50,7 +51,7 @@
             background: var(--dark-light);
             padding: 60px 50px;
             border: 3px solid var(--primary);
-            box-shadow: 
+            box-shadow:
                 0 0 40px rgba(255, 0, 102, 0.3),
                 inset 0 0 40px rgba(255, 0, 102, 0.05);
             max-width: 450px;
@@ -588,7 +589,8 @@
             color: var(--secondary);
         }
 
-        .payment-options, .document-options {
+        .payment-options,
+        .document-options {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
@@ -743,12 +745,17 @@
         }
     </style>
 </head>
+
 <body>
     <!-- LOGIN SCREEN -->
     <div class="login-container" id="loginScreen">
         <div class="login-box">
             <div class="login-logo">CINERAMA</div>
             <div class="login-subtitle">Sistema de Venta de Entradas</div>
+            <div class="input-group">
+                <label>RUC</label>
+                <input type="text" id="ruc" value="Ingrese RUC">
+            </div>
             <div class="input-group">
                 <label>Usuario</label>
                 <input type="text" id="username" value="cajero">
@@ -757,67 +764,79 @@
                 <label>Contraseña</label>
                 <input type="password" id="password" value="1234">
             </div>
-            <button id="loginBtn" class="login-btn">INGRESAR AL SISTEMA</button>
+            <button id="loginBtn" onclick="iniciarSesion()" class="login-btn">INGRESAR AL SISTEMA</button>
             <div class="login-hint">
                 💡 Usuario: Segun Caja | La indicada por Administracion<br>
-                   ingresar con su usuario asignado
+                ingresar con su usuario asignado
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function iniciarSesion() {
+            var ruc = $("#ruc").val();
+            var username = $("#username").val();
+            var password = $("#password").val();
 
-    <script>      
-
-        // ==================== LOGIN ====================
-        // permitir login con Enter
-        document.getElementById('password').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('loginBtn').click();
-            }
-        });
-
-        //iniciar sesion usando ajax y js la pagina para el ajax es assets/ajas/login.php ahi se procesa la informacion
-        //y si es correcta se redirige a la pagina de inicio
-        //si es incorrecta se muestra un mensaje de error
-        document.getElementById('loginBtn').addEventListener('click', function() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if (username.trim() && password.trim()) {
-                currentUser = username;
-                document.getElementById('currentUser').textContent = username;
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('posScreen').classList.add('active');
-                //hacer la peticion ajax
-                $.ajax({
-                    url: 'assets/ajax/login.php',
-                    type: 'POST',
-                    data: {
-                        username: username,
-                        password: password
-                    },
-                    success: function(response) {
-                        if (response == 'success') {
-                            //redirigir a la pagina de inicio
-                            window.location.href = '/inicio';
-                        } else {
-                            alert('Usuario o contraseña incorrectos');
-                        }
-                    }
+            if (ruc == "" || username == "" || password == "") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Campos incompletos',
+                    text: 'Por favor ingrese todos los campos',
+                    confirmButtonColor: '#ff0055'
                 });
-            } else {
-                alert('Por favor ingrese usuario y contraseña');
+                return;
+            }
+
+
+            $.ajax({
+                url: "assets/ajax/login.php",
+                type: "POST",
+                data: {
+                    ruc: ruc,
+                    username: username,
+                    password: password
+                },
+                success: function(response) {
+                    if (response.status == "success") {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Bienvenido!',
+                            text: 'Acceso concedido',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.href = "index.php";
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error de acceso',
+                            text: response.message,
+                            confirmButtonColor: '#ff0055'
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de conexión',
+                        text: 'No se pudo conectar con el servidor',
+                        confirmButtonColor: '#ff0055'
+                    });
+                }
+            });
+
+        }
+
+        // Permitir login con Enter
+        $(document).on('keypress', '#password', function(e) {
+            if (e.which === 13) {
+                iniciarSesion();
             }
         });
-
-       
-        
-
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if (confirm('¿Está seguro que desea cerrar sesión?')) {
-                location.reload();
-            }
-        });
-    
     </script>
 </body>
+
 </html>
