@@ -73,9 +73,94 @@ switch ($action) {
 
     case 'getTariffs':
         try {
-            $stmt = $connect->prepare("SELECT id, nombre as name, precio as price FROM tbl_tarifa WHERE estado = '1'");
-            $stmt->execute();
-            $tariffs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $idLocal = $_SESSION['id_local'] ?? null;
+            $idSala = $_GET['id_sala'] ?? null;
+            $tariffs = [];
+
+            // Detectar tabla disponible: tbl_tarifas (por local) o tbl_tarifa (global)
+            $table = null;
+            try {
+                $chk = $connect->query("SHOW TABLES LIKE 'tbl_tarifas'");
+                if ($chk && $chk->rowCount() > 0) $table = 'tbl_tarifas';
+            } catch (PDOException $e) {}
+            if ($table === null) $table = 'tbl_tarifa';
+
+            if ($table === 'tbl_tarifas') {
+                // Obtener columnas para normalizar
+                $cols = [];
+                try {
+                    $res = $connect->query("SHOW COLUMNS FROM tbl_tarifas");
+                    $cols = $res->fetchAll(PDO::FETCH_COLUMN, 0);
+                } catch (PDOException $e) {}
+
+                // Determinar columna de local y construir consulta
+                $localCols = ['id_local','local','idlocal','sede'];
+                $priceCols = ['precio','monto','valor','importe','costo'];
+                $nameCols = ['nombre','name','descripcion','tarifa'];
+                $stateCols = ['estado','activado','activo','habilitado'];
+
+                $localCol = null;
+                foreach ($localCols as $c) if (in_array($c, $cols)) { $localCol = $c; break; }
+
+                $sql = "SELECT * FROM tbl_tarifas";
+                $params = [];
+                if ($idLocal && $localCol) {
+                    $sql .= " WHERE $localCol = ?";
+                    $params[] = $idLocal;
+                }
+                $stmt = $connect->prepare($sql);
+                $stmt->execute($params);
+                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Normalizar y filtrar activas
+                foreach ($rows as $r) {
+                    // activo?
+                    $active = null;
+                    foreach ($stateCols as $sc) {
+                        if (array_key_exists($sc, $r)) {
+                            $val = strtoupper((string)$r[$sc]);
+                            $active = in_array($val, ['1','SI','SÍ','ACTIVO','HABILITADO','TRUE']);
+                            break;
+                        }
+                    }
+                    if ($active === false) continue;
+
+                    // nombre
+                    $name = null; foreach ($nameCols as $nc) { if (isset($r[$nc]) && $r[$nc] !== '') { $name = $r[$nc]; break; } }
+                    // precio
+                    $price = null; foreach ($priceCols as $pc) { if (isset($r[$pc]) && is_numeric($r[$pc])) { $price = (float)$r[$pc]; break; } }
+                    if ($name !== null && $price !== null) {
+                        $tariffs[] = ['id' => $r['id'] ?? null, 'name' => $name, 'price' => $price];
+                    }
+                }
+            }
+
+            // Si aún vacío y existe relación por sala
+            if (empty($tariffs) && $idSala) {
+                try {
+                    $qSala = "
+                        SELECT t.id, t.nombre as name, t.precio as price
+                        FROM tbl_tarifa_sala ts
+                        JOIN tbl_tarifa t ON ts.id_tarifa = t.id
+                        WHERE ts.id_sala = ? AND t.estado = '1'
+                    ";
+                    $stSala = $connect->prepare($qSala);
+                    $stSala->execute([$idSala]);
+                    $tariffs = $stSala->fetchAll(PDO::FETCH_ASSOC);
+                } catch (PDOException $e) {}
+            }
+
+            // Fallback a tabla global si sigue vacío
+            if (empty($tariffs)) {
+                try {
+                    $stmt = $connect->prepare("SELECT id, nombre as name, precio as price FROM tbl_tarifa WHERE estado = '1'");
+                    $stmt->execute();
+                    $tariffs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                } catch (PDOException $e) {
+                    $tariffs = [];
+                }
+            }
+
             echo json_encode(['status' => 'success', 'data' => $tariffs]);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
@@ -106,6 +191,62 @@ switch ($action) {
             }
 
             echo json_encode(['status' => 'success', 'data' => $formatted]);
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'getSeatLayout':
+        try {
+            $idFuncion = $_GET['id_funcion'] ?? 0;
+            $idCartelera = $_GET['id_cartelera'] ?? 0;
+            $idSala = null;
+
+            if ($idFuncion) {
+                $stmtF = $connect->prepare("SELECT id_sala FROM tbl_funciones WHERE id = ?");
+                $stmtF->execute([$idFuncion]);
+                $rowF = $stmtF->fetch(PDO::FETCH_ASSOC);
+                if ($rowF) $idSala = $rowF['id_sala'];
+            }
+            if (!$idSala && $idCartelera) {
+                $stmtC = $connect->prepare("SELECT sala FROM tbl_cartelera WHERE id = ?");
+                $stmtC->execute([$idCartelera]);
+                $rowC = $stmtC->fetch(PDO::FETCH_ASSOC);
+                if ($rowC) $idSala = $rowC['sala'];
+            }
+            if (!$idSala) {
+                throw new Exception("No se pudo determinar la sala para la función/cartelera");
+            }
+
+            // Intentar con columna 'numero'
+            $layout = [];
+            try {
+                $stmtS = $connect->prepare("SELECT fila, numero FROM tbl_sala_asiento WHERE idsala = ? ORDER BY fila ASC, numero ASC");
+                $stmtS->execute([$idSala]);
+                $seats = $stmtS->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                // Fallback si columna se llama 'columna'
+                $stmtS = $connect->prepare("SELECT fila, columna AS numero FROM tbl_sala_asiento WHERE idsala = ? ORDER BY fila ASC, columna ASC");
+                $stmtS->execute([$idSala]);
+                $seats = $stmtS->fetchAll(PDO::FETCH_ASSOC);
+            }
+
+            foreach ($seats as $s) {
+                $fila = $s['fila'];
+                $num = intval($s['numero']);
+                if (!isset($layout[$fila])) $layout[$fila] = [];
+                $layout[$fila][] = $num;
+            }
+
+            // Ordenar números por fila
+            foreach ($layout as $fila => $nums) {
+                sort($layout[$fila], SORT_NUMERIC);
+            }
+
+            // Ordenar filas alfabéticamente
+            ksort($layout);
+
+            echo json_encode(['status' => 'success', 'data' => ['id_sala' => $idSala, 'layout' => $layout]]);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
