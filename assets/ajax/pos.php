@@ -76,6 +76,9 @@ switch ($action) {
             $idLocal = $_SESSION['id_local'] ?? null;
             $idSala = $_GET['id_sala'] ?? null;
             $tariffs = [];
+            $dayIndex = intval(date('N'));
+            $dayMap = [1 => 'l', 2 => 'm', 3 => 'x', 4 => 'j', 5 => 'v', 6 => 's', 7 => 'd'];
+            $dayCol = $dayMap[$dayIndex];
 
             // Detectar tabla disponible: tbl_tarifas (por local) o tbl_tarifa (global)
             $table = null;
@@ -98,6 +101,9 @@ switch ($action) {
                 $priceCols = ['precio','monto','valor','importe','costo'];
                 $nameCols = ['nombre','name','descripcion','tarifa'];
                 $stateCols = ['estado','activado','activo','habilitado'];
+                $dayColUse = null;
+                if (in_array($dayCol, $cols)) { $dayColUse = $dayCol; }
+                else { $upperDay = strtoupper($dayCol); if (in_array($upperDay, $cols)) { $dayColUse = $upperDay; } }
 
                 $localCol = null;
                 foreach ($localCols as $c) if (in_array($c, $cols)) { $localCol = $c; break; }
@@ -114,7 +120,6 @@ switch ($action) {
 
                 // Normalizar y filtrar activas
                 foreach ($rows as $r) {
-                    // activo?
                     $active = null;
                     foreach ($stateCols as $sc) {
                         if (array_key_exists($sc, $r)) {
@@ -123,11 +128,14 @@ switch ($action) {
                             break;
                         }
                     }
-                    if ($active === false) continue;
+                    $activeDay = true;
+                    if ($dayColUse && array_key_exists($dayColUse, $r)) {
+                        $valDay = strtoupper((string)$r[$dayColUse]);
+                        $activeDay = in_array($valDay, ['1','SI','SÍ','TRUE']);
+                    }
+                    if ($active === false || !$activeDay) continue;
 
-                    // nombre
                     $name = null; foreach ($nameCols as $nc) { if (isset($r[$nc]) && $r[$nc] !== '') { $name = $r[$nc]; break; } }
-                    // precio
                     $price = null; foreach ($priceCols as $pc) { if (isset($r[$pc]) && is_numeric($r[$pc])) { $price = (float)$r[$pc]; break; } }
                     if ($name !== null && $price !== null) {
                         $tariffs[] = ['id' => $r['id'] ?? null, 'name' => $name, 'price' => $price];
@@ -153,8 +161,25 @@ switch ($action) {
             // Fallback a tabla global si sigue vacío
             if (empty($tariffs)) {
                 try {
-                    $stmt = $connect->prepare("SELECT id, nombre as name, precio as price FROM tbl_tarifa WHERE estado = '1'");
-                    $stmt->execute();
+                    $colsG = [];
+                    try {
+                        $resG = $connect->query("SHOW COLUMNS FROM tbl_tarifa");
+                        $colsG = $resG->fetchAll(PDO::FETCH_COLUMN, 0);
+                    } catch (PDOException $e) {}
+                    $localColsG = ['id_local','local','idlocal','sede'];
+                    $localColG = null;
+                    foreach ($localColsG as $c) if (in_array($c, $colsG)) { $localColG = $c; break; }
+                    $dayColUseG = null;
+                    if (in_array($dayCol, $colsG)) { $dayColUseG = $dayCol; }
+                    else { $upperDay = strtoupper($dayCol); if (in_array($upperDay, $colsG)) { $dayColUseG = $upperDay; } }
+                    $hasEstado = in_array('estado', $colsG);
+                    $sqlG = "SELECT id, nombre as name, precio as price FROM tbl_tarifa WHERE 1=1";
+                    $paramsG = [];
+                    if ($hasEstado) $sqlG .= " AND estado = '1'";
+                    if ($idLocal && $localColG) { $sqlG .= " AND $localColG = ?"; $paramsG[] = $idLocal; }
+                    if ($dayColUseG) { $sqlG .= " AND `$dayColUseG` = '1'"; }
+                    $stmt = $connect->prepare($sqlG);
+                    $stmt->execute($paramsG);
                     $tariffs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 } catch (PDOException $e) {
                     $tariffs = [];
