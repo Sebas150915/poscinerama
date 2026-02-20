@@ -854,6 +854,66 @@
         </div>
     </div>
 
+    <div class="modal" id="contribModal">
+        <div class="modal-content">
+            <div class="modal-title">Datos del Contribuyente</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div>
+                    <label style="color: var(--secondary); font-size:11px; text-transform:uppercase;">Tipo Documento</label>
+                    <select id="contribTipo" style="width:100%; padding:10px; background:var(--dark); border:2px solid var(--dark-lighter); color:var(--text);">
+                        <option value="RUC">RUC</option>
+                        <option value="DNI">DNI</option>
+                        <option value="OTROS">OTROS</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="color: var(--secondary); font-size:11px; text-transform:uppercase;">Número</label>
+                    <div style="display:flex; gap:8px;">
+                        <input id="contribNum" style="flex:1; padding:10px; background:var(--dark); border:2px solid var(--dark-lighter); color:var(--text);" />
+                        <button class="option-btn" id="contribSearchBtn" style="padding:10px 15px;">🔍</button>
+                    </div>
+                </div>
+                <div>
+                    <label style="color: var(--secondary); font-size:11px; text-transform:uppercase;">API Key (RUC)</label>
+                    <input id="contribApiKey" placeholder="5000" style="width:100%; padding:10px; background:var(--dark); border:2px solid var(--dark-lighter); color:var(--text);" />
+                </div>
+                <div></div>
+                <div style="grid-column: 1 / span 2;">
+                    <label style="color: var(--secondary); font-size:11px; text-transform:uppercase;">Nombre / Razón Social</label>
+                    <input id="contribNombre" style="width:100%; padding:10px; background:var(--dark); border:2px solid var(--dark-lighter); color:var(--text);" />
+                </div>
+                <div style="grid-column: 1 / span 2;">
+                    <label style="color: var(--secondary); font-size:11px; text-transform:uppercase;">Dirección</label>
+                    <input id="contribDireccion" style="width:100%; padding:10px; background:var(--dark); border:2px solid var(--dark-lighter); color:var(--text);" />
+                </div>
+                <div>
+                    <label style="color: var(--secondary); font-size:11px; text-transform:uppercase;">Distrito</label>
+                    <input id="contribDistrito" style="width:100%; padding:10px; background:var(--dark); border:2px solid var(--dark-lighter); color:var(--text);" />
+                </div>
+                <div>
+                    <label style="color: var(--secondary); font-size:11px; text-transform:uppercase;">Provincia</label>
+                    <input id="contribProvincia" style="width:100%; padding:10px; background:var(--dark); border:2px solid var(--dark-lighter); color:var(--text);" />
+                </div>
+                <div>
+                    <label style="color: var(--secondary); font-size:11px; text-transform:uppercase;">Departamento</label>
+                    <input id="contribDepartamento" style="width:100%; padding:10px; background:var(--dark); border:2px solid var(--dark-lighter); color:var(--text);" />
+                </div>
+                <div>
+                    <label style="color: var(--secondary); font-size:11px; text-transform:uppercase;">Correo</label>
+                    <input id="contribCorreo" style="width:100%; padding:10px; background:var(--dark); border:2px solid var(--dark-lighter); color:var(--text);" />
+                </div>
+                <div>
+                    <label style="color: var(--secondary); font-size:11px; text-transform:uppercase;">Teléfono</label>
+                    <input id="contribTelefono" style="width:100%; padding:10px; background:var(--dark); border:2px solid var(--dark-lighter); color:var(--text);" />
+                </div>
+            </div>
+            <div class="modal-actions" style="margin-top:15px;">
+                <button class="btn-modal btn-cancel" id="contribCancel">Cerrar</button>
+                <button class="btn-modal btn-confirm" id="contribUse">Usar Datos</button>
+            </div>
+        </div>
+    </div>
+
     <!-- TICKET MODAL -->
     <div class="modal" id="ticketModal">
         <div class="modal-content" style="max-width: 500px;">
@@ -879,6 +939,7 @@
         let paymentMethod = null;
         let documentType = null;
         let currentUser = '';
+        let contribData = null;
 
         function initializePOS() {
             fetchMovies();
@@ -1161,6 +1222,9 @@
                 document.querySelectorAll('.document-option').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 documentType = btn.dataset.document;
+                if (documentType === 'factura') {
+                    document.getElementById('contribModal').classList.add('active');
+                }
             });
         });
 
@@ -1172,6 +1236,13 @@
             if (!paymentMethod || !documentType) {
                 alert('Por favor seleccione método de pago y tipo de documento');
                 return;
+            }
+            if (documentType === 'factura') {
+                if (!contribData || !contribData.num_doc || !contribData.nombre) {
+                    alert('Debe ingresar los datos del contribuyente (RUC) para facturar');
+                    document.getElementById('contribModal').classList.add('active');
+                    return;
+                }
             }
             const itemsTarifa = [];
             tariffs.forEach(t => {
@@ -1188,10 +1259,14 @@
                 method: 'POST',
                 data: JSON.stringify({
                     id_funcion: selectedFuncion,
+                    id_cartelera: selectedCartelera,
+                    id_hora: selectedHora,
                     total: total,
                     tipo_comprobante: documentType === 'boleta' ? 'BOLETA' : 'FACTURA',
                     medio_pago: paymentMethod === 'cash' ? 'EFECTIVO' : 'TARJETA',
-                    items: items
+                    items: items,
+                    cliente_doc: contribData ? contribData.num_doc : '',
+                    cliente_nombre: contribData ? contribData.nombre : ''
                 }),
                 contentType: 'application/json',
                 dataType: 'json',
@@ -1205,6 +1280,60 @@
                     }
                 }
             });
+        });
+
+        document.getElementById('contribSearchBtn').addEventListener('click', () => {
+            const tipo = document.getElementById('contribTipo').value;
+            const num = document.getElementById('contribNum').value.trim();
+            const apiKey = document.getElementById('contribApiKey').value.trim() || '5000';
+            if (num === '') {
+                alert('Ingrese número de documento');
+                return;
+            }
+            const params = { tipo: tipo, num_doc: num };
+            if (tipo === 'RUC') params.api_key = apiKey;
+            $.ajax({
+                url: 'assets/ajax/pos.php?action=searchContributor',
+                method: 'GET',
+                data: params,
+                dataType: 'json',
+                success: function(resp) {
+                    if (resp.status === 'success') {
+                        const d = resp.data;
+                        contribData = {
+                            tipo_doc: d.tipo_doc || (tipo === 'RUC' ? 6 : (tipo === 'DNI' ? 1 : 0)),
+                            num_doc: d.num_doc || num,
+                            nombre: d.nombre || '',
+                            direccion: d.direccion || '',
+                            distrito: d.distrito || '',
+                            provincia: d.provincia || '',
+                            departamento: d.departamento || '',
+                            correo: d.correo || '',
+                            telefono: d.telefono || ''
+                        };
+                        document.getElementById('contribNombre').value = contribData.nombre;
+                        document.getElementById('contribDireccion').value = contribData.direccion;
+                        document.getElementById('contribDistrito').value = contribData.distrito;
+                        document.getElementById('contribProvincia').value = contribData.provincia;
+                        document.getElementById('contribDepartamento').value = contribData.departamento;
+                        document.getElementById('contribCorreo').value = contribData.correo;
+                        document.getElementById('contribTelefono').value = contribData.telefono;
+                    } else {
+                        alert(resp.message || 'No se encontró contribuyente');
+                    }
+                }
+            });
+        });
+
+        document.getElementById('contribUse').addEventListener('click', () => {
+            if (!contribData || !contribData.num_doc || !contribData.nombre) {
+                alert('Complete datos del contribuyente');
+                return;
+            }
+            document.getElementById('contribModal').classList.remove('active');
+        });
+        document.getElementById('contribCancel').addEventListener('click', () => {
+            document.getElementById('contribModal').classList.remove('active');
         });
 
         function generateTicket(totalOverride) {
@@ -1272,6 +1401,10 @@
                     <div class="ticket-row">
                         <span>Documento:</span>
                         <span>${documentType === 'boleta' ? 'BOLETA' : 'FACTURA'}</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span>Cliente:</span>
+                        <span>${contribData ? (contribData.num_doc + ' - ' + contribData.nombre) : 'VARIOS'}</span>
                     </div>
                     <div class="ticket-barcode">${barcode}</div>
                     <div class="ticket-footer">

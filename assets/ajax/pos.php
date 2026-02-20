@@ -283,76 +283,88 @@ switch ($action) {
             if (!$input) {
                 throw new Exception("Datos de venta no recibidos");
             }
-
             $idUsuario = $_SESSION['id'];
-            $idFuncion = $input['id_funcion'];
+            $idFuncion = intval($input['id_funcion'] ?? 0);
+            $idCartelera = intval($input['id_cartelera'] ?? 0);
+            $idHora = intval($input['id_hora'] ?? 0);
             $total = $input['total'];
             $tipoComprobante = $input['tipo_comprobante'];
             $medioPago = $input['medio_pago'];
-            $items = $input['items']; // array( {seat: 'A1', tarifa_id: 1, precio: 15.00} )
-
-            // Generar código de venta
+            $items = $input['items'];
             $codigo = "POS-" . date('YmdHis') . rand(10, 99);
             $idLocal = $_SESSION['id_local'];
             $clienteDoc = $input['cliente_doc'] ?? '';
             $clienteNombre = $input['cliente_nombre'] ?? '';
-
+            if ($idFuncion <= 0) {
+                if ($idCartelera <= 0 || $idHora <= 0) {
+                    throw new Exception("Falta identificar función");
+                }
+                $stmtC = $connect->prepare("SELECT pelicula, sala FROM tbl_cartelera WHERE id = ?");
+                $stmtC->execute([$idCartelera]);
+                $rowC = $stmtC->fetch(PDO::FETCH_ASSOC);
+                if (!$rowC) {
+                    throw new Exception("Cartelera no encontrada");
+                }
+                $fechaActual = date('Y-m-d');
+                $stmtF = $connect->prepare("SELECT id FROM tbl_funciones WHERE id_pelicula = ? AND id_sala = ? AND id_hora = ? AND fecha = ? LIMIT 1");
+                $stmtF->execute([$rowC['pelicula'], $rowC['sala'], $idHora, $fechaActual]);
+                $func = $stmtF->fetch(PDO::FETCH_ASSOC);
+                if ($func) {
+                    $idFuncion = intval($func['id']);
+                } else {
+                    $stmtIns = $connect->prepare("INSERT INTO tbl_funciones (id_pelicula, id_sala, id_hora, fecha) VALUES (?, ?, ?, ?)");
+                    $stmtIns->execute([$rowC['pelicula'], $rowC['sala'], $idHora, $fechaActual]);
+                    $idFuncion = intval($connect->lastInsertId());
+                }
+            }
             $connect->beginTransaction();
-
-            // 1. Insertar en tbl_ventas
-            $qVenta = "INSERT INTO tbl_ventas (codigo, id_local, id_usuario, id_funcion, total, medio_pago, tipo_comprobante, cliente_doc, cliente_nombre, origen, estado) 
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'BOLETERIA', 'PAGADO')";
+            $qVenta = "INSERT INTO tbl_ventas (codigo, id_local, id_usuario, id_funcion, total, medio_pago, tipo_comprobante, cliente_doc, cliente_nombre, origen, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'BOLETERIA', 'PAGADO')";
             $stmtVenta = $connect->prepare($qVenta);
-            $stmtVenta->execute([
-                $codigo,
-                $idLocal,
-                $idUsuario,
-                $idFuncion,
-                $total,
-                $medioPago,
-                $tipoComprobante,
-                $clienteDoc,
-                $clienteNombre
-            ]);
+            $stmtVenta->execute([$codigo, $idLocal, $idUsuario, $idFuncion, $total, $medioPago, $tipoComprobante, $clienteDoc, $clienteNombre]);
             $idVenta = $connect->lastInsertId();
-
-            // Obtener id_sala de la función para buscar los asientos
             $stmtFunc = $connect->prepare("SELECT id_sala FROM tbl_funciones WHERE id = ?");
             $stmtFunc->execute([$idFuncion]);
             $funcData = $stmtFunc->fetch(PDO::FETCH_ASSOC);
             $idSala = $funcData['id_sala'];
-
-            // 2. Insertar en tbl_boletos
+            $colsSA = [];
+            try {
+                $resSA = $connect->query("SHOW COLUMNS FROM tbl_sala_asiento");
+                $colsSA = $resSA->fetchAll(PDO::FETCH_COLUMN, 0);
+            } catch (PDOException $e) {}
+            $numCol = in_array('numero', $colsSA) ? 'numero' : 'columna';
+            $colsB = [];
+            try {
+                $resB = $connect->query("SHOW COLUMNS FROM tbl_boletos");
+                $colsB = $resB->fetchAll(PDO::FETCH_COLUMN, 0);
+            } catch (PDOException $e) {}
+            $hasCart = in_array('id_cartelera', $colsB);
+            $hasHora = in_array('id_hora', $colsB);
             foreach ($items as $item) {
-                // Resolver id_asiento
-                // El seat viene como 'A1', 'A2', etc.
                 $fila = substr($item['seat'], 0, 1);
                 $numero = substr($item['seat'], 1);
-
-                $qAsiento = "SELECT id FROM tbl_sala_asiento WHERE idsala = ? AND fila = ? AND columna = ?";
-                $stmtAsiento = $connect->prepare($qAsiento);
+                $stmtAsiento = $connect->prepare("SELECT id FROM tbl_sala_asiento WHERE idsala = ? AND fila = ? AND $numCol = ?");
                 $stmtAsiento->execute([$idSala, $fila, $numero]);
                 $asiento = $stmtAsiento->fetch(PDO::FETCH_ASSOC);
-
                 if (!$asiento) {
-                    throw new Exception("Asiento {$item['seat']} no encontrado en la sala");
+                    throw new Exception("Asiento {$item['seat']} no encontrado");
                 }
-
-                $qBoleto = "INSERT INTO tbl_boletos (id_venta, id_asiento, fila, columna, letra, numero, id_tarifa, precio, estado) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVO')";
+                $colsInsert = "id_venta, id_asiento, fila, columna, letra, numero, id_tarifa, precio, estado";
+                $placeholders = "?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVO'";
+                $params = [$idVenta, $asiento['id'], $fila, $numero, $fila, $numero, $item['tarifa_id'], $item['precio']];
+                if ($hasCart) {
+                    $colsInsert .= ", id_cartelera";
+                    $placeholders .= ", ?";
+                    $params[] = $idCartelera;
+                }
+                if ($hasHora) {
+                    $colsInsert .= ", id_hora";
+                    $placeholders .= ", ?";
+                    $params[] = $idHora;
+                }
+                $qBoleto = "INSERT INTO tbl_boletos ($colsInsert) VALUES ($placeholders)";
                 $stmtBoleto = $connect->prepare($qBoleto);
-                $stmtBoleto->execute([
-                    $idVenta,
-                    $asiento['id'],
-                    $fila,
-                    $numero,
-                    $fila, // letra
-                    $numero,
-                    $item['tarifa_id'],
-                    $item['precio']
-                ]);
+                $stmtBoleto->execute($params);
             }
-
             $connect->commit();
             echo json_encode(['status' => 'success', 'message' => 'Venta procesada correctamente', 'id_venta' => $idVenta, 'codigo' => $codigo]);
         } catch (Exception $e) {
@@ -438,6 +450,149 @@ switch ($action) {
             echo json_encode(['status' => 'success', 'message' => 'Venta anulada correctamente']);
         } catch (Exception $e) {
             if ($connect->inTransaction()) $connect->rollBack();
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'searchContributor':
+        try {
+            $tipo = $_GET['tipo'] ?? $_POST['tipo'] ?? '';
+            $numDoc = $_GET['num_doc'] ?? $_POST['num_doc'] ?? '';
+            $apiKey = $_GET['api_key'] ?? $_POST['api_key'] ?? '';
+            if ($numDoc === '') {
+                throw new Exception("Número de documento requerido");
+            }
+            $tipoDocCode = 0;
+            if (is_numeric($tipo)) {
+                $tipoDocCode = intval($tipo);
+            } else {
+                $t = strtoupper(trim($tipo));
+                if ($t === 'DNI') $tipoDocCode = 1;
+                else if ($t === 'RUC') $tipoDocCode = 6;
+                else $tipoDocCode = 0;
+            }
+            $data = [
+                'tipo_doc' => $tipoDocCode,
+                'num_doc' => $numDoc,
+                'nombre' => '',
+                'direccion' => '',
+                'ubigeo' => '',
+                'distrito' => '',
+                'provincia' => '',
+                'departamento' => '',
+                'correo' => '',
+                'telefono' => ''
+            ];
+            $existsStmt = $connect->prepare("SELECT * FROM tbl_contribuyente WHERE num_doc = ? LIMIT 1");
+            $existsStmt->execute([$numDoc]);
+            $existing = $existsStmt->fetch(PDO::FETCH_ASSOC);
+            if ($existing) {
+                echo json_encode(['status' => 'success', 'data' => $existing, 'source' => 'db']);
+                break;
+            }
+            if ($tipoDocCode === 6) {
+                if ($apiKey === '') {
+                    throw new Exception("api_key requerido para RUC");
+                }
+                $url = "https://www.smartbase.club/sunat/ruc2.php?ruc=" . urlencode($numDoc) . "&api_key=" . urlencode($apiKey);
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_TIMEOUT => 10
+                ]);
+                $resp = curl_exec($ch);
+                if ($resp === false) {
+                    throw new Exception("Error consultando RUC: " . curl_error($ch));
+                }
+                curl_close($ch);
+                $json = @json_decode($resp, true);
+                if (is_array($json)) {
+                    $data['nombre'] = $json['razon_social'] ?? $json['nombre'] ?? '';
+                    $data['direccion'] = $json['direccion'] ?? ($json['domicilio_fiscal'] ?? '');
+                    $data['ubigeo'] = $json['ubigeo'] ?? '';
+                    $data['distrito'] = $json['distrito'] ?? '';
+                    $data['provincia'] = $json['provincia'] ?? '';
+                    $data['departamento'] = $json['departamento'] ?? '';
+                }
+            } else if ($tipoDocCode === 1) {
+                $url = "http://smartbase.club/webservices/dni.php?dni=" . urlencode($numDoc);
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_TIMEOUT => 10
+                ]);
+                $resp = curl_exec($ch);
+                if ($resp === false) {
+                    throw new Exception("Error consultando DNI: " . curl_error($ch));
+                }
+                curl_close($ch);
+                $json = @json_decode($resp, true);
+                if (is_array($json)) {
+                    $nombre = '';
+                    if (isset($json['nombre'])) $nombre = $json['nombre'];
+                    else {
+                        $nombres = $json['nombres'] ?? '';
+                        $ap = $json['apellido_paterno'] ?? '';
+                        $am = $json['apellido_materno'] ?? '';
+                        $nombre = trim(($ap . ' ' . $am . ' ' . $nombres));
+                    }
+                    $data['nombre'] = $nombre;
+                }
+            }
+            $ins = $connect->prepare("INSERT INTO tbl_contribuyente (idempresa, tipo_doc, num_doc, direccion, ubigeo, distrito, provincia, departamento, correo, telefono) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $idEmpresa = $_SESSION['id_local'] ?? 0;
+            $ins->execute([
+                $idEmpresa,
+                $data['tipo_doc'],
+                $data['num_doc'],
+                $data['direccion'],
+                $data['ubigeo'],
+                $data['distrito'],
+                $data['provincia'],
+                $data['departamento'],
+                $data['correo'],
+                $data['telefono']
+            ]);
+            $idContrib = $connect->lastInsertId();
+            $sel = $connect->prepare("SELECT * FROM tbl_contribuyente WHERE id = ?");
+            $sel->execute([$idContrib]);
+            $row = $sel->fetch(PDO::FETCH_ASSOC);
+            if ($data['nombre'] !== '') {
+                try {
+                    $connect->prepare("UPDATE tbl_contribuyente SET direccion = ?, distrito = ?, provincia = ?, departamento = ? WHERE id = ?")
+                        ->execute([$data['direccion'], $data['distrito'], $data['provincia'], $data['departamento'], $idContrib]);
+                    $row['direccion'] = $data['direccion'];
+                    $row['distrito'] = $data['distrito'];
+                    $row['provincia'] = $data['provincia'];
+                    $row['departamento'] = $data['departamento'];
+                } catch (Exception $e) {}
+            }
+            $row['nombre'] = $data['nombre'];
+            echo json_encode(['status' => 'success', 'data' => $row, 'source' => 'api']);
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'getContributor':
+        try {
+            $numDoc = $_GET['num_doc'] ?? '';
+            if ($numDoc === '') {
+                throw new Exception("Número de documento requerido");
+            }
+            $stmt = $connect->prepare("SELECT * FROM tbl_contribuyente WHERE num_doc = ? LIMIT 1");
+            $stmt->execute([$numDoc]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                echo json_encode(['status' => 'success', 'data' => $row]);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Contribuyente no encontrado']);
+            }
+        } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
         break;
