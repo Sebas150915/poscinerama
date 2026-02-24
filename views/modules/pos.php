@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CinePOS - Sistema de Venta</title>
-    <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>CinePOS - Cinerama</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Saira+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -13,171 +15,89 @@
         }
 
         :root {
-            --primary: #ff0066;
-            --primary-dark: #cc0052;
-            --secondary: #00ffcc;
-            --dark: #0a0a0f;
-            --dark-light: #1a1a24;
-            --dark-lighter: #2a2a38;
-            --text: #ffffff;
-            --text-dim: #a0a0b0;
-            --success: #00ff88;
-            --warning: #ffaa00;
-            --danger: #ff3366;
+            --bg-primary: #f0f0f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f8f7ff;
+            --bg-input: #f4f3f8;
+            --border: #e2e0ef;
+            --border-active: rgba(180, 130, 20, 0.4);
+            --gold: #c8940a;
+            --gold-dim: rgba(200, 148, 10, 0.4);
+            --gold-light: #daa520;
+            --gold-bg: rgba(200, 148, 10, 0.08);
+            --rose: #d6264a;
+            --rose-dim: rgba(214, 38, 74, 0.12);
+            --emerald: #16a34a;
+            --sky: #2563eb;
+            --text: #1a1a2e;
+            --text-secondary: #5c5a72;
+            --text-muted: #9896af;
+            --danger: #dc2626;
+            --danger-dim: rgba(220, 38, 38, 0.08);
+            --danger-bg: rgba(220, 38, 38, 0.06);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --radius-xs: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         body {
-            font-family: 'Space Mono', monospace;
-            background: linear-gradient(135deg, var(--dark) 0%, #12121c 100%);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
             color: var(--text);
             overflow-x: hidden;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* LOGIN SCREEN */
+        /* ====== HIDE LOGIN (not used in this page) ====== */
         .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 0, 102, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(0, 255, 204, 0.1) 0%, transparent 50%),
-                var(--dark);
+            display: none;
         }
 
-        .login-box {
-            background: var(--dark-light);
-            padding: 60px 50px;
-            border: 3px solid var(--primary);
-            box-shadow: 
-                0 0 40px rgba(255, 0, 102, 0.3),
-                inset 0 0 40px rgba(255, 0, 102, 0.05);
-            max-width: 450px;
-            width: 90%;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-logo {
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 52px;
-            font-weight: 900;
-            text-align: center;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: -2px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .login-subtitle {
-            text-align: center;
-            color: var(--text-dim);
-            font-size: 11px;
-            margin-bottom: 40px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--secondary);
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 15px;
-            background: var(--dark);
-            border: 2px solid var(--dark-lighter);
-            color: var(--text);
-            font-family: 'Space Mono', monospace;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(255, 0, 102, 0.2);
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 18px;
-            background: var(--primary);
-            border: none;
-            color: var(--text);
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .login-btn:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 0 30px rgba(255, 0, 102, 0.6);
-        }
-
-        .login-hint {
-            text-align: center;
-            color: var(--text-dim);
-            font-size: 10px;
-            margin-top: 20px;
-            padding: 10px;
-            background: var(--dark);
-            border-left: 3px solid var(--secondary);
-        }
-
-        /* MAIN POS INTERFACE */
+        /* ====== POS LAYOUT ====== */
         .pos-container {
             display: none;
             min-height: 100vh;
+            background: var(--bg-primary);
         }
 
         .pos-container.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* ====== HEADER ====== */
         .pos-header {
-            background: var(--dark-light);
-            border-bottom: 3px solid var(--primary);
-            padding: 20px 30px;
+            background: #ffffff;
+            border-bottom: 2px solid var(--gold);
+            padding: 14px 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .pos-title {
             font-family: 'Saira Condensed', sans-serif;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: -1px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            letter-spacing: 3px;
+            color: var(--gold);
         }
 
         .pos-user {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 16px;
         }
 
         .user-info {
@@ -185,39 +105,46 @@
         }
 
         .user-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--secondary);
-        }
-
-        .user-role {
-            font-size: 10px;
-            color: var(--text-dim);
-            text-transform: uppercase;
-        }
-
-        .logout-btn {
-            padding: 10px 20px;
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            cursor: pointer;
-            font-family: 'Saira Condensed', sans-serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
             color: var(--text);
         }
 
+        .user-role {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .logout-btn {
+            padding: 8px 18px;
+            background: transparent;
+            border: 1px solid var(--rose-dim);
+            border-radius: var(--radius-xs);
+            color: var(--rose);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+        }
+
+        .logout-btn:hover {
+            background: var(--rose);
+            color: #fff;
+            border-color: var(--rose);
+            box-shadow: 0 4px 16px rgba(214, 38, 74, 0.2);
+        }
+
+        /* ====== 3 COLUMN GRID ====== */
         .pos-main {
             display: grid;
-            grid-template-columns: 350px 1fr 350px;
-            height: calc(100vh - 85px);
-            gap: 0;
+            grid-template-columns: 320px 1fr 340px;
+            height: calc(100vh - 60px);
+            gap: 1px;
+            background: var(--border);
         }
 
         @media (max-width: 1200px) {
@@ -228,177 +155,226 @@
         }
 
         .pos-section {
-            background: var(--dark-light);
-            padding: 25px;
+            background: var(--bg-secondary);
+            padding: 24px;
             overflow-y: auto;
-            border-right: 2px solid var(--dark);
-        }
-
-        .pos-section:last-child {
-            border-right: none;
         }
 
         .section-title {
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 2.5px;
             margin-bottom: 20px;
-            color: var(--secondary);
-            letter-spacing: 1px;
-            border-bottom: 2px solid var(--dark-lighter);
-            padding-bottom: 10px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
         }
 
-        /* LEFT PANEL - MOVIES */
+        .section-title i {
+            color: var(--gold);
+            font-size: 14px;
+        }
+
+        /* ====== LEFT PANEL - MOVIES ====== */
         .movie-card {
-            background: var(--dark);
-            padding: 15px;
-            margin-bottom: 15px;
+            background: var(--bg-card);
+            padding: 16px;
+            margin-bottom: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
             position: relative;
+            box-shadow: var(--shadow-sm);
         }
 
         .movie-card:hover {
-            border-color: var(--primary);
-            transform: translateX(5px);
+            border-color: var(--border-active);
+            background: var(--bg-card-hover);
+            transform: translateX(3px);
+            box-shadow: var(--shadow-md);
         }
 
         .movie-card.selected {
-            border-color: var(--secondary);
-            background: var(--dark-lighter);
+            border-color: var(--gold);
+            background: var(--gold-bg);
+            box-shadow: 0 0 0 1px var(--gold-dim), var(--shadow-md);
+        }
+
+        .movie-card.selected::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--gold);
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
         }
 
         .movie-title {
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
             font-weight: 700;
-            margin-bottom: 5px;
-            text-transform: uppercase;
+            margin-bottom: 4px;
+            color: var(--text);
         }
 
         .movie-info {
             font-size: 11px;
-            color: var(--text-dim);
-            margin-bottom: 10px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-weight: 400;
         }
 
         .showtimes {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 10px;
         }
 
         .showtime-btn {
-            padding: 8px 12px;
-            background: var(--dark-lighter);
-            border: 1px solid var(--dark-lighter);
-            color: var(--text);
-            font-size: 12px;
-            font-family: 'Space Mono', monospace;
+            padding: 12px 18px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--transition);
+            min-width: 80px;
+            text-align: center;
         }
 
         .showtime-btn:hover {
-            border-color: var(--primary);
-            background: var(--primary);
+            border-color: var(--gold);
+            color: var(--gold);
+            background: var(--gold-bg);
         }
 
         .showtime-btn.selected {
-            background: var(--secondary);
-            color: var(--dark);
-            border-color: var(--secondary);
+            background: var(--gold);
+            color: #fff;
+            border-color: var(--gold);
             font-weight: 700;
+            box-shadow: 0 2px 8px rgba(200, 148, 10, 0.3);
         }
 
-        /* CENTER PANEL - SEAT MAP */
+        /* ====== CENTER PANEL - SEAT MAP ====== */
         .center-panel {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px;
-            background: var(--dark);
+            padding: 28px 20px;
+            background: var(--bg-primary);
+            position: relative;
         }
 
         .screen {
-            width: 80%;
-            height: 40px;
-            background: linear-gradient(180deg, var(--secondary) 0%, transparent 100%);
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 14px;
+            width: 70%;
+            max-width: 500px;
+            height: 6px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin-bottom: 8px;
+            border-radius: 0 0 50% 50%;
+            position: relative;
+        }
+
+        .screen::after {
+            content: 'PANTALLA';
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
             font-weight: 700;
+            letter-spacing: 4px;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--dark);
-            border-radius: 50% 50% 0 0;
+            white-space: nowrap;
         }
 
         .seat-map {
             display: grid;
-            gap: 8px;
+            gap: 5px;
+            margin-top: 36px;
+            padding: 10px;
         }
 
         .seat-row {
             display: flex;
-            gap: 8px;
+            gap: 4px;
             align-items: center;
         }
 
         .row-label {
-            width: 30px;
+            width: 28px;
             text-align: center;
             font-weight: 700;
-            color: var(--secondary);
-            font-size: 14px;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
         }
 
         .seat {
-            width: 40px;
-            height: 40px;
-            background: var(--dark-lighter);
-            border: 2px solid var(--dark-lighter);
+            width: 42px;
+            height: 42px;
+            background-image: url('assets/images/butacas/butacaVacia.gif');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--transition);
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            color: var(--text-dim);
-        }
-
-        .seat:hover:not(.occupied) {
-            border-color: var(--primary);
-            transform: scale(1.1);
+            font-size: 15px;
+            font-weight: 950;
+            color: #000;
+            /* Black for green seats */
+            text-shadow: 0 0 2px #fff, 0 0 4px #fff;
+            /* Explicit white glow */
+            border: none;
         }
 
         .seat.occupied {
-            background: var(--danger);
-            border-color: var(--danger);
+            background-image: url('assets/images/butacas/butacaOcupada.gif');
             cursor: not-allowed;
-            opacity: 0.5;
+            color: #fff;
+            /* White for blue seats */
+            text-shadow: 0 0 3px #000;
         }
 
         .seat.selected {
-            background: var(--secondary);
-            border-color: var(--secondary);
-            color: var(--dark);
-            font-weight: 700;
+            background-image: url('assets/images/butacas/miButaca.gif');
+            color: #ca1515;
+            /* Red as requested */
+            font-weight: 950;
+            text-shadow: 0 0 3px #fff;
+            filter: drop-shadow(0 2px 8px rgba(200, 148, 10, 0.4));
+        }
+
+        .seat:hover:not(.occupied) {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
         }
 
         .seat-legend {
             display: flex;
-            gap: 20px;
-            margin-top: 30px;
-            font-size: 11px;
+            gap: 24px;
+            margin-top: 32px;
+            font-size: 13px;
+            /* Slightly larger legend text */
+            color: var(--text);
+            font-weight: 700;
         }
 
         .legend-item {
@@ -407,23 +383,25 @@
             gap: 8px;
         }
 
-        .legend-box {
-            width: 20px;
-            height: 20px;
-            border: 2px solid;
+        .legend-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
         }
 
-        /* RIGHT PANEL - TARIFF */
+        /* ====== RIGHT PANEL - TARIFF & SUMMARY ====== */
         .tariff-item {
-            background: var(--dark);
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 2px solid var(--dark-lighter);
-            transition: all 0.3s ease;
+            background: var(--bg-card);
+            padding: 16px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
         }
 
         .tariff-item.disabled {
-            opacity: 0.4;
+            opacity: 0.35;
             pointer-events: none;
         }
 
@@ -431,82 +409,92 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .tariff-name {
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
         }
 
         .tariff-price {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--secondary);
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--gold);
         }
 
         .tariff-qty {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .qty-btn {
-            width: 30px;
-            height: 30px;
-            background: var(--dark-lighter);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            font-size: 18px;
-            font-weight: 700;
+            width: 32px;
+            height: 32px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .qty-btn:hover:not(:disabled) {
-            background: var(--primary);
-            color: var(--text);
+            background: var(--gold);
+            color: #fff;
+            border-color: var(--gold);
         }
 
         .qty-btn:disabled {
-            opacity: 0.3;
+            opacity: 0.25;
             cursor: not-allowed;
-            border-color: var(--dark-lighter);
         }
 
         .qty-display {
-            width: 50px;
+            width: 40px;
             text-align: center;
             font-size: 18px;
-            font-weight: 700;
-            color: var(--secondary);
+            font-weight: 800;
+            color: var(--text);
         }
 
+        /* Summary */
         .summary {
-            background: var(--dark-lighter);
+            background: #faf9ff;
             padding: 20px;
             margin-top: 20px;
-            border: 2px solid var(--primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
         .summary-row.total {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--secondary);
-            border-top: 2px solid var(--dark);
-            padding-top: 10px;
-            margin-top: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--gold);
+            border-top: 2px solid var(--border);
+            padding-top: 14px;
+            margin-top: 14px;
+            margin-bottom: 0;
         }
 
+        /* Action Buttons */
         .action-buttons {
             display: flex;
             flex-direction: column;
@@ -515,44 +503,52 @@
         }
 
         .btn-action {
-            padding: 15px;
+            padding: 14px;
             border: none;
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
             font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 1.5px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            letter-spacing: 1px;
+            transition: var(--transition);
+            border-radius: var(--radius-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-clear {
             background: transparent;
-            border: 2px solid var(--danger);
+            border: 1px solid rgba(220, 38, 38, 0.25);
             color: var(--danger);
         }
 
         .btn-clear:hover {
-            background: var(--danger);
-            color: var(--text);
+            background: var(--danger-bg);
+            border-color: var(--danger);
         }
 
         .btn-pay {
-            background: var(--primary);
-            color: var(--text);
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(200, 148, 10, 0.25);
         }
 
         .btn-pay:hover:not(:disabled) {
-            background: var(--primary-dark);
-            box-shadow: 0 0 20px rgba(255, 0, 102, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(200, 148, 10, 0.35);
         }
 
         .btn-pay:disabled {
             opacity: 0.3;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
-        /* MODAL */
+        /* ====== MODALS ====== */
         .modal {
             display: none;
             position: fixed;
@@ -560,7 +556,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -571,232 +569,344 @@
         }
 
         .modal-content {
-            background: var(--dark-light);
-            padding: 40px;
+            background: #ffffff;
+            padding: 36px;
             max-width: 500px;
-            width: 90%;
-            border: 3px solid var(--primary);
+            width: 92%;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             position: relative;
+            box-shadow: var(--shadow-lg);
+            animation: fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-title {
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 28px;
-            font-weight: 900;
-            text-transform: uppercase;
-            margin-bottom: 30px;
-            color: var(--secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: var(--text);
         }
 
-        .payment-options, .document-options {
+        .payment-options,
+        .document-options {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .option-btn {
-            padding: 25px;
-            background: var(--dark);
-            border: 2px solid var(--dark-lighter);
-            color: var(--text);
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            text-transform: uppercase;
+            padding: 20px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .option-btn:hover {
-            border-color: var(--primary);
-            background: var(--dark-lighter);
+            border-color: var(--gold);
+            background: var(--gold-bg);
+            color: var(--text);
         }
 
         .option-btn.selected {
-            background: var(--secondary);
-            color: var(--dark);
-            border-color: var(--secondary);
+            background: var(--gold-bg);
+            color: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 0 0 1px var(--gold-dim);
+            font-weight: 700;
         }
 
         .modal-actions {
             display: flex;
-            gap: 15px;
+            gap: 12px;
         }
 
         .btn-modal {
             flex: 1;
-            padding: 15px;
+            padding: 14px;
             border: none;
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
             font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            border-radius: var(--radius-xs);
         }
 
         .btn-cancel {
-            background: transparent;
-            border: 2px solid var(--text-dim);
-            color: var(--text-dim);
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
         }
 
         .btn-cancel:hover {
-            border-color: var(--text);
+            border-color: var(--text-muted);
             color: var(--text);
         }
 
         .btn-confirm {
-            background: var(--primary);
-            color: var(--text);
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #fff;
         }
 
         .btn-confirm:hover {
-            background: var(--primary-dark);
+            box-shadow: 0 4px 16px rgba(200, 148, 10, 0.3);
         }
 
-        /* TICKET */
+        /* ====== TICKET ====== */
         .ticket {
-            background: white;
-            color: #000;
-            padding: 30px;
-            max-width: 400px;
+            background: #fff;
+            color: #1a1a2e;
+            padding: 28px;
+            max-width: 380px;
             margin: 0 auto;
-            font-family: 'Courier New', monospace;
+            font-family: 'Inter', sans-serif;
+            border-radius: var(--radius-sm);
         }
 
         .ticket-header {
             text-align: center;
-            border-bottom: 2px dashed #000;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
+            border-bottom: 2px dashed #d1d5db;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
         }
 
         .ticket-cinema {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 5px;
+            font-family: 'Saira Condensed', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #1a1a2e;
         }
 
         .ticket-row {
             display: flex;
             justify-content: space-between;
-            margin: 8px 0;
+            margin: 6px 0;
             font-size: 12px;
+            color: #4b5563;
         }
 
         .ticket-row.large {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
-            margin: 15px 0;
+            margin: 12px 0;
+            color: #1a1a2e;
         }
 
         .ticket-footer {
             text-align: center;
-            border-top: 2px dashed #000;
-            padding-top: 15px;
-            margin-top: 15px;
+            border-top: 2px dashed #d1d5db;
+            padding-top: 14px;
+            margin-top: 14px;
             font-size: 10px;
+            color: #9ca3af;
         }
 
         .ticket-barcode {
             text-align: center;
-            font-size: 20px;
+            font-size: 18px;
             letter-spacing: 2px;
-            margin: 15px 0;
+            margin: 14px 0;
             font-family: 'Courier New', monospace;
+            color: #1a1a2e;
         }
 
         .btn-print {
             width: 100%;
-            padding: 15px;
-            background: var(--success);
+            padding: 14px;
+            background: var(--emerald);
             border: none;
-            color: var(--dark);
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 18px;
+            border-radius: var(--radius-xs);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
             font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 16px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-print:hover {
-            background: #00dd77;
+            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.3);
         }
 
+        /* ====== CONTRIB MODAL INLINE STYLES OVERRIDE ====== */
+        #contribModal label {
+            font-family: 'Inter', sans-serif !important;
+            color: var(--text-muted) !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            letter-spacing: 1.5px !important;
+            margin-bottom: 6px !important;
+            display: block !important;
+        }
+
+        #contribModal input,
+        #contribModal select {
+            font-family: 'Inter', sans-serif !important;
+            border-radius: var(--radius-xs) !important;
+            background: var(--bg-input) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            padding: 10px 14px !important;
+            font-size: 13px !important;
+            transition: var(--transition) !important;
+        }
+
+        #contribModal input:focus,
+        #contribModal select:focus {
+            outline: none !important;
+            border-color: var(--gold) !important;
+            box-shadow: 0 0 0 3px rgba(200, 148, 10, 0.1) !important;
+        }
+
+        /* ====== SCROLLBAR ====== */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--dark);
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--primary);
+            background: rgba(0, 0, 0, 0.12);
+            border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary);
+            background: rgba(200, 148, 10, 0.4);
+        }
+
+        /* ====== NO SELECTION MESSAGE ====== */
+        #noSelectionMessage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            min-height: 300px;
+        }
+
+        #noSelectionMessage i {
+            font-size: 48px;
+            color: var(--text-muted);
+            opacity: 0.4;
         }
     </style>
 </head>
+
 <body>
-    
+
 
     <!-- MAIN POS INTERFACE -->
     <div class="pos-container active" id="posScreen">
         <div class="pos-header">
-            <div class="pos-title">CINERAMA / BOLETERIA</div>
+            <div class="pos-title">CINERAMA</div>
             <div class="pos-user">
                 <div class="user-info">
                     <div class="user-name" id="currentUser">Cajero</div>
                     <div class="user-role">Punto de Venta #01</div>
                 </div>
-                <button class="logout-btn" id="logoutBtn">SALIR</button>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-right-from-bracket"></i> Salir</button>
             </div>
         </div>
 
         <div class="pos-main">
             <!-- LEFT PANEL: MOVIES -->
             <div class="pos-section">
-                <div class="section-title">📽️ Películas en Cartelera</div>
+                <div class="section-title"><i class="fas fa-film"></i> Cartelera</div>
                 <div id="moviesList"></div>
             </div>
 
             <!-- CENTER PANEL: SEAT MAP -->
             <div class="pos-section center-panel">
-                <div class="section-title">Selección de Asientos</div>
+                <div class="section-title"><i class="fas fa-couch"></i> Selección de Asientos</div>
                 <div id="seatMapContainer" style="display: none;">
-                    <div class="screen">PANTALLA</div>
+                    <div class="screen"></div>
                     <div class="seat-map" id="seatMap"></div>
                     <div class="seat-legend">
                         <div class="legend-item">
-                            <div class="legend-box" style="background: var(--dark-lighter); border-color: var(--dark-lighter);"></div>
+                            <img src="assets/images/butacas/butacaVacia.gif" class="legend-icon" alt="Disponible">
                             <span>Disponible</span>
                         </div>
                         <div class="legend-item">
-                            <div class="legend-box" style="background: var(--secondary); border-color: var(--secondary);"></div>
+                            <img src="assets/images/butacas/miButaca.gif" class="legend-icon" alt="Seleccionado">
                             <span>Seleccionado</span>
                         </div>
                         <div class="legend-item">
-                            <div class="legend-box" style="background: var(--danger); border-color: var(--danger); opacity: 0.5;"></div>
+                            <img src="assets/images/butacas/butacaOcupada.gif" class="legend-icon" alt="Ocupado">
                             <span>Ocupado</span>
                         </div>
                     </div>
                 </div>
-                <div id="noSelectionMessage" style="text-align: center; color: var(--text-dim); padding: 50px 20px;">
-                    Seleccione una película y horario para ver el mapa de asientos
+                <div id="noSelectionMessage">
+                    <i class="fas fa-ticket"></i>
+                    <span style="color: var(--text-muted); font-size: 13px; font-weight: 500;">Seleccione una película y horario</span>
                 </div>
             </div>
 
             <!-- RIGHT PANEL: TARIFF & SUMMARY -->
             <div class="pos-section">
-                <div class="section-title">🎫 Tarifas</div>
+                <div class="section-title"><i class="fas fa-file-invoice"></i> Comprobante y Cliente</div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="color: var(--text-muted); font-size:10px; text-transform:uppercase; font-weight: 600; letter-spacing: 1px; display: block; margin-bottom: 5px;">Tipo de Comprobante</label>
+                    <select id="sideDocumentType" class="option-btn" style="width: 100%; text-align: left; padding: 10px 15px; height: auto; border-radius: var(--radius-xs);">
+                        <option value="boleta">BOLETA</option>
+                        <option value="factura">FACTURA</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="color: var(--text-muted); font-size:10px; text-transform:uppercase; font-weight: 600; letter-spacing: 1px; display: block; margin-bottom: 5px;">RUC / DNI del Cliente</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="sideClientDoc" placeholder="Buscar documento..." style="flex: 1; padding: 10px; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-xs); font-family: 'Inter', sans-serif; font-size: 13px;">
+                        <button class="option-btn" id="sideSearchBtn" style="padding: 10px 15px; border-radius: var(--radius-xs);"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+
+                <div id="sideClientInfo" style="display: none; padding: 10px; background: var(--gold-bg); border: 1px solid var(--gold-dim); border-radius: var(--radius-xs); margin-top: 10px;">
+                    <div id="sideClientName" style="font-size: 11px; font-weight: 700; color: var(--gold); word-break: break-all;"></div>
+                    <div id="sideClientAddress" style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;"></div>
+                </div>
+
+                <div class="section-title" style="margin-top: 25px;"><i class="fas fa-tags"></i> Tarifas</div>
                 <div id="tariffList"></div>
-                
+
                 <div class="summary">
                     <div class="summary-row">
                         <span>Asientos:</span>
@@ -814,10 +924,10 @@
 
                 <div class="action-buttons">
                     <button class="btn-action btn-clear" id="clearBtn">
-                        🗑️ Liberar Asientos
+                        <i class="fas fa-rotate-left"></i> Liberar Asientos
                     </button>
                     <button class="btn-action btn-pay" id="payBtn" disabled>
-                        💳 Procesar Pago
+                        <i class="fas fa-credit-card"></i> Procesar Pago
                     </button>
                 </div>
             </div>
@@ -830,20 +940,20 @@
             <div class="modal-title">Método de Pago</div>
             <div class="payment-options">
                 <button class="option-btn payment-option" data-payment="cash">
-                    💵 Efectivo
+                    <i class="fas fa-money-bill-wave"></i> Efectivo
                 </button>
                 <button class="option-btn payment-option" data-payment="card">
-                    💳 Tarjeta
+                    <i class="fas fa-credit-card"></i> Tarjeta
                 </button>
             </div>
-            
+
             <div class="modal-title" style="font-size: 24px; margin-top: 20px;">Tipo de Documento</div>
             <div class="document-options">
                 <button class="option-btn document-option" data-document="boleta">
-                    📄 Boleta
+                    <i class="fas fa-receipt"></i> Boleta
                 </button>
                 <button class="option-btn document-option" data-document="factura">
-                    📋 Factura
+                    <i class="fas fa-file-invoice"></i> Factura
                 </button>
             </div>
 
@@ -870,7 +980,7 @@
                     <label style="color: var(--secondary); font-size:11px; text-transform:uppercase;">Número</label>
                     <div style="display:flex; gap:8px;">
                         <input id="contribNum" style="flex:1; padding:10px; background:var(--dark); border:2px solid var(--dark-lighter); color:var(--text);" />
-                        <button class="option-btn" id="contribSearchBtn" style="padding:10px 15px;">🔍</button>
+                        <button class="option-btn" id="contribSearchBtn" style="padding:10px 15px;"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
                 <div>
@@ -918,7 +1028,7 @@
     <div class="modal" id="ticketModal">
         <div class="modal-content" style="max-width: 500px;">
             <div id="ticketContent"></div>
-            <button class="btn-print" id="printBtn">🖨️ Imprimir Ticket</button>
+            <button class="btn-print" id="printBtn"><i class="fas fa-print"></i> Imprimir Ticket</button>
             <button class="btn-modal btn-confirm" id="newSaleBtn" style="width: 100%; margin-top: 15px;">
                 Nueva Venta
             </button>
@@ -937,20 +1047,141 @@
         let seatLayout = {};
         let tariffQuantities = {};
         let paymentMethod = null;
-        let documentType = null;
-        let currentUser = '';
+        let documentType = 'boleta';
+        let currentUser = '<?php echo $_SESSION["id"]; ?>';
+        let currentEmpresa = '<?php echo $_SESSION["id_local"]; ?>';
         let contribData = null;
+        let currentSerie = '';
+        let currentNumber = '';
+
+        // Side panel elements
+        const sideDocType = document.getElementById('sideDocumentType');
+        const sideDocInput = document.getElementById('sideClientDoc');
+        const sideSearchBtn = document.getElementById('sideSearchBtn');
+        const sideClientInfo = document.getElementById('sideClientInfo');
+        const sideClientName = document.getElementById('sideClientName');
+        const sideClientAddress = document.getElementById('sideClientAddress');
 
         function initializePOS() {
             fetchMovies();
             fetchTariffs();
+            fetchSeries();
+            setupEventListeners();
+        }
+
+        function fetchSeries() {
+            const cod = (documentType === 'boleta') ? '03' : '01';
+            $.ajax({
+                url: 'assets/ajax/pos.php?action=searchSerie',
+                method: 'POST',
+                data: {
+                    action: 'searchSerie',
+                    cliente: cod,
+                    usuario: currentUser,
+                    empresa: currentEmpresa,
+                    cod: cod
+                },
+                dataType: 'json',
+                success: function(resp) {
+                    if (resp) {
+                        currentSerie = resp.serie;
+                        currentNumber = resp.numero;
+                        console.log('Serie cargada:', currentSerie, currentNumber);
+                    }
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            sideDocType.addEventListener('change', () => {
+                documentType = sideDocType.value;
+                fetchSeries();
+                // Sync with payment modal buttons if they exist
+                document.querySelectorAll('.document-option').forEach(btn => {
+                    if (btn.dataset.document === documentType) {
+                        btn.classList.add('selected');
+                    } else {
+                        btn.classList.remove('selected');
+                    }
+                });
+            });
+
+            sideSearchBtn.addEventListener('click', () => {
+                const doc = sideDocInput.value.trim();
+                if (doc === '') return;
+                searchClient(doc);
+            });
+
+            sideDocInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const doc = sideDocInput.value.trim();
+                    if (doc === '') return;
+                    searchClient(doc);
+                }
+            });
+        }
+
+        function searchClient(num) {
+            const tipo = (num.length === 8) ? 'DNI' : 'RUC';
+            const apiKey = '5000';
+
+            sideSearchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            sideSearchBtn.disabled = true;
+
+            $.ajax({
+                url: 'assets/ajax/pos.php?action=searchContributor',
+                method: 'GET',
+                data: {
+                    tipo: tipo,
+                    num_doc: num,
+                    api_key: apiKey
+                },
+                dataType: 'json',
+                success: function(resp) {
+                    sideSearchBtn.innerHTML = '<i class="fas fa-search"></i>';
+                    sideSearchBtn.disabled = false;
+
+                    if (resp.status === 'success') {
+                        const d = resp.data;
+                        contribData = {
+                            tipo_doc: d.tipo_doc || (tipo === 'RUC' ? 6 : (tipo === 'DNI' ? 1 : 0)),
+                            num_doc: d.num_doc || num,
+                            nombre: d.nombre || '',
+                            direccion: d.direccion || '',
+                            distrito: d.distrito || '',
+                            provincia: d.provincia || '',
+                            departamento: d.departamento || '',
+                            correo: d.correo || '',
+                            telefono: d.telefono || ''
+                        };
+
+                        // Update UI
+                        sideClientName.textContent = contribData.nombre;
+                        sideClientAddress.textContent = contribData.direccion || 'Sin dirección registrada';
+                        sideClientInfo.style.display = 'block';
+
+                        // Sync with modal
+                        document.getElementById('contribNum').value = contribData.num_doc;
+                        document.getElementById('contribNombre').value = contribData.nombre;
+                        document.getElementById('contribDireccion').value = contribData.direccion;
+                    } else {
+                        alert(resp.message || 'No se encontró contribuyente');
+                        sideClientInfo.style.display = 'none';
+                    }
+                },
+                error: function() {
+                    sideSearchBtn.innerHTML = '<i class="fas fa-search"></i>';
+                    sideSearchBtn.disabled = false;
+                    alert('Error en la búsqueda del cliente');
+                }
+            });
         }
 
         function fetchMovies() {
             $.ajax({
                 url: 'assets/ajax/pos.php?action=getBillBoard',
                 dataType: 'json',
-                success: function (resp) {
+                success: function(resp) {
                     if (resp.status === 'success') {
                         moviesData = resp.data || [];
                         renderMovies();
@@ -964,11 +1195,13 @@
             $.ajax({
                 url: url,
                 dataType: 'json',
-                success: function (resp) {
+                success: function(resp) {
                     if (resp.status === 'success') {
                         tariffs = resp.data || [];
                         tariffQuantities = {};
-                        tariffs.forEach(t => { tariffQuantities[t.id] = 0; });
+                        tariffs.forEach(t => {
+                            tariffQuantities[t.id] = 0;
+                        });
                         renderTariffs();
                         updateTariffState();
                         updateSummary();
@@ -1041,7 +1274,7 @@
             $.ajax({
                 url: `assets/ajax/pos.php?action=getSeatLayout&id_funcion=${selectedFuncion}&id_cartelera=${selectedCartelera}`,
                 dataType: 'json',
-                success: function (resp) {
+                success: function(resp) {
                     if (resp.status === 'success') {
                         seatLayout = (resp.data && resp.data.layout) ? resp.data.layout : {};
                         renderSeatMap();
@@ -1054,7 +1287,7 @@
             $.ajax({
                 url: `assets/ajax/pos.php?action=getOccupiedSeats&id_cartelera=${selectedCartelera}&id_hora=${selectedHora}`,
                 dataType: 'json',
-                success: function (resp) {
+                success: function(resp) {
                     if (resp.status === 'success') {
                         occupiedSeats = resp.data || [];
                         renderSeatMap();
@@ -1189,7 +1422,9 @@
 
         function clearSelection() {
             selectedSeats = [];
-            Object.keys(tariffQuantities).forEach(id => { tariffQuantities[id] = 0; });
+            Object.keys(tariffQuantities).forEach(id => {
+                tariffQuantities[id] = 0;
+            });
             tariffs.forEach(tariff => {
                 const el = document.getElementById(`qty-${tariff.id}`);
                 if (el) el.textContent = '0';
@@ -1202,10 +1437,19 @@
 
         document.getElementById('payBtn').addEventListener('click', () => {
             paymentMethod = null;
-            documentType = null;
+            // documentType already set via side panel, but allow re-selection if needed
             document.getElementById('paymentModal').classList.add('active');
-            document.querySelectorAll('.option-btn').forEach(btn => {
+            document.querySelectorAll('.option-btn.payment-option').forEach(btn => {
                 btn.classList.remove('selected');
+            });
+
+            // Highlight current document type in modal
+            document.querySelectorAll('.document-option').forEach(btn => {
+                if (btn.dataset.document === documentType) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
             });
         });
 
@@ -1222,8 +1466,12 @@
                 document.querySelectorAll('.document-option').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 documentType = btn.dataset.document;
+                sideDocType.value = documentType; // Sync side panel
+                fetchSeries(); // Fetch series for new type
                 if (documentType === 'factura') {
-                    document.getElementById('contribModal').classList.add('active');
+                    if (!contribData || !contribData.num_doc) {
+                        document.getElementById('contribModal').classList.add('active');
+                    }
                 }
             });
         });
@@ -1233,11 +1481,12 @@
         });
 
         document.getElementById('confirmPayment').addEventListener('click', () => {
-            if (!paymentMethod || !documentType) {
+            const finalDocType = documentType;
+            if (!paymentMethod || !finalDocType) {
                 alert('Por favor seleccione método de pago y tipo de documento');
                 return;
             }
-            if (documentType === 'factura') {
+            if (finalDocType === 'factura') {
                 if (!contribData || !contribData.num_doc || !contribData.nombre) {
                     alert('Debe ingresar los datos del contribuyente (RUC) para facturar');
                     document.getElementById('contribModal').classList.add('active');
@@ -1246,14 +1495,23 @@
             }
             const itemsTarifa = [];
             tariffs.forEach(t => {
-                for (let i = 0; i < (tariffQuantities[t.id] || 0); i++) itemsTarifa.push({ id: t.id, price: Number(t.price) });
+                for (let i = 0; i < (tariffQuantities[t.id] || 0); i++) itemsTarifa.push({
+                    id: t.id,
+                    price: Number(t.price)
+                });
             });
             const items = selectedSeats.map((seat, idx) => {
                 const t = itemsTarifa[idx];
-                return { seat: seat, tarifa_id: t ? t.id : null, precio: t ? t.price : 0 };
+                return {
+                    seat: seat,
+                    tarifa_id: t ? t.id : null,
+                    precio: t ? t.price : 0
+                };
             }).filter(it => it.tarifa_id !== null);
             let total = 0;
-            items.forEach(it => { total += it.precio; });
+            items.forEach(it => {
+                total += it.precio;
+            });
             $.ajax({
                 url: 'assets/ajax/pos.php?action=processSale',
                 method: 'POST',
@@ -1262,15 +1520,17 @@
                     id_cartelera: selectedCartelera,
                     id_hora: selectedHora,
                     total: total,
-                    tipo_comprobante: documentType === 'boleta' ? 'BOLETA' : 'FACTURA',
+                    tipo_comprobante: finalDocType === 'boleta' ? 'BOLETA' : 'FACTURA',
                     medio_pago: paymentMethod === 'cash' ? 'EFECTIVO' : 'TARJETA',
                     items: items,
-                    cliente_doc: contribData ? contribData.num_doc : '',
-                    cliente_nombre: contribData ? contribData.nombre : ''
+                    cliente_doc: (contribData && contribData.num_doc) ? contribData.num_doc : '',
+                    cliente_nombre: (contribData && contribData.nombre) ? contribData.nombre : '',
+                    serie: currentSerie,
+                    num_doc: currentNumber
                 }),
                 contentType: 'application/json',
                 dataType: 'json',
-                success: function (resp) {
+                success: function(resp) {
                     if (resp.status === 'success') {
                         document.getElementById('paymentModal').classList.remove('active');
                         generateTicket(total);
@@ -1290,7 +1550,10 @@
                 alert('Ingrese número de documento');
                 return;
             }
-            const params = { tipo: tipo, num_doc: num };
+            const params = {
+                tipo: tipo,
+                num_doc: num
+            };
             if (tipo === 'RUC') params.api_key = apiKey;
             $.ajax({
                 url: 'assets/ajax/pos.php?action=searchContributor',
@@ -1341,7 +1604,9 @@
             const totalSeats = selectedSeats.length;
             let total = typeof totalOverride === 'number' ? totalOverride : 0;
             if (typeof totalOverride !== 'number') {
-                tariffs.forEach(t => { total += Number(t.price) * (tariffQuantities[t.id] || 0); });
+                tariffs.forEach(t => {
+                    total += Number(t.price) * (tariffQuantities[t.id] || 0);
+                });
             }
             let ticketDetails = '';
             tariffs.forEach(t => {
@@ -1434,7 +1699,9 @@
             selectedFuncion = null;
             selectedSala = null;
             selectedSeats = [];
-            Object.keys(tariffQuantities).forEach(id => { tariffQuantities[id] = 0; });
+            Object.keys(tariffQuantities).forEach(id => {
+                tariffQuantities[id] = 0;
+            });
             tariffs.forEach(tariff => {
                 const el = document.getElementById(`qty-${tariff.id}`);
                 if (el) el.textContent = '0';
@@ -1447,10 +1714,19 @@
             });
             document.getElementById('seatMapContainer').style.display = 'none';
             document.getElementById('noSelectionMessage').style.display = 'block';
+
+            // Reset side panel
+            sideDocType.value = 'boleta';
+            documentType = 'boleta';
+            sideDocInput.value = '';
+            sideClientInfo.style.display = 'none';
+            contribData = null;
+
             updateSummary();
         }
 
         window.onload = initializePOS;
     </script>
 </body>
+
 </html>

@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cinerama - Sistema de Venta</title>
-    <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Saira+Condensed:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -35,113 +36,503 @@
             min-height: 100vh;
         }
 
-        /* LOGIN SCREEN */
+        /* ====== LOGIN SCREEN - PREMIUM CINEMA THEME ====== */
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(232, 175, 48, 0.15);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(232, 175, 48, 0.3);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        @keyframes spin-slow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         .login-container {
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background:
-                radial-gradient(circle at 20% 50%, rgba(255, 0, 102, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(0, 255, 204, 0.1) 0%, transparent 50%),
-                var(--dark);
-        }
-
-        .login-box {
-            background: var(--dark-light);
-            padding: 60px 50px;
-            border: 3px solid var(--primary);
-            box-shadow:
-                0 0 40px rgba(255, 0, 102, 0.3),
-                inset 0 0 40px rgba(255, 0, 102, 0.05);
-            max-width: 450px;
-            width: 90%;
+            background: linear-gradient(135deg, #0c0c1d 0%, #1a0a2e 25%, #16132d 50%, #0d1b2a 75%, #0c0c1d 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             position: relative;
             overflow: hidden;
         }
 
+        /* Floating cinema particles */
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(232, 175, 48, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(220, 50, 80, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(100, 80, 200, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 70% 60%, rgba(232, 175, 48, 0.04) 0%, transparent 30%);
+            pointer-events: none;
+        }
+
+        /* Floating film elements */
+        .cinema-particle {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.08;
+            color: #e8af30;
+            font-size: 24px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .cinema-particle:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+            font-size: 28px;
+        }
+
+        .cinema-particle:nth-child(2) {
+            top: 20%;
+            right: 10%;
+            animation-delay: 1s;
+            font-size: 22px;
+        }
+
+        .cinema-particle:nth-child(3) {
+            bottom: 15%;
+            left: 15%;
+            animation-delay: 2s;
+            font-size: 32px;
+        }
+
+        .cinema-particle:nth-child(4) {
+            bottom: 25%;
+            right: 5%;
+            animation-delay: 3s;
+            font-size: 20px;
+        }
+
+        .cinema-particle:nth-child(5) {
+            top: 50%;
+            left: 3%;
+            animation-delay: 4s;
+            font-size: 26px;
+        }
+
+        .cinema-particle:nth-child(6) {
+            top: 40%;
+            right: 8%;
+            animation-delay: 1.5s;
+            font-size: 18px;
+        }
+
+        .cinema-particle:nth-child(7) {
+            bottom: 40%;
+            left: 8%;
+            animation-delay: 3.5s;
+            font-size: 30px;
+        }
+
+        .cinema-particle:nth-child(8) {
+            top: 70%;
+            right: 15%;
+            animation-delay: 2.5s;
+            font-size: 24px;
+        }
+
+        /* Film strip decoration */
+        .film-strip {
+            position: absolute;
+            width: 50px;
+            height: 100%;
+            opacity: 0.03;
+            pointer-events: none;
+        }
+
+        .film-strip.left {
+            left: 30px;
+            top: 0;
+        }
+
+        .film-strip.right {
+            right: 30px;
+            top: 0;
+        }
+
+        .film-strip-hole {
+            width: 14px;
+            height: 10px;
+            background: #e8af30;
+            margin: 8px auto;
+            border-radius: 2px;
+        }
+
+        .login-box {
+            background: rgba(22, 20, 45, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 50px 45px 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(232, 175, 48, 0.15);
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.03),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            max-width: 440px;
+            width: 92%;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #e8af30, #dc3250, #e8af30, transparent);
+            border-radius: 24px 24px 0 0;
+        }
+
+        /* Logo area */
+        .login-logo-wrapper {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .login-cinema-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, #e8af30, #dc3250);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(232, 175, 48, 0.3);
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
         .login-logo {
             font-family: 'Saira Condensed', sans-serif;
-            font-size: 52px;
+            font-size: 48px;
             font-weight: 900;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 0;
             text-transform: uppercase;
-            letter-spacing: -2px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #e8af30 0%, #f0c75e 40%, #e8af30 60%, #d4982a 100%);
+            background-size: 200% auto;
+            animation: shimmer 3s linear infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            line-height: 1;
         }
 
         .login-subtitle {
             text-align: center;
-            color: var(--text-dim);
-            font-size: 11px;
-            margin-bottom: 40px;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            margin-bottom: 36px;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
         }
 
+        /* Divider */
+        .login-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(232, 175, 48, 0.3), transparent);
+        }
+
+        .login-divider span {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: rgba(232, 175, 48, 0.5);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        /* Input groups */
         .input-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }
+
+        .input-group:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .input-group:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .input-group:nth-child(3) {
+            animation-delay: 0.3s;
         }
 
         .input-group label {
             display: block;
             margin-bottom: 8px;
+            font-family: 'Inter', sans-serif;
             font-size: 11px;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--secondary);
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(232, 175, 48, 0.4);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            pointer-events: none;
         }
 
         .input-group input {
             width: 100%;
-            padding: 15px;
-            background: var(--dark);
-            border: 2px solid var(--dark-lighter);
-            color: var(--text);
-            font-family: 'Space Mono', monospace;
+            padding: 14px 16px 14px 48px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
             font-size: 14px;
-            transition: all 0.3s ease;
+            font-weight: 400;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
         }
 
         .input-group input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(255, 0, 102, 0.2);
+            border-color: rgba(232, 175, 48, 0.5);
+            background: rgba(232, 175, 48, 0.06);
+            box-shadow: 0 0 0 4px rgba(232, 175, 48, 0.08), 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
+        .input-group input:focus+.input-icon,
+        .input-wrapper:focus-within .input-icon {
+            color: #e8af30;
+        }
+
+        /* Toggle password */
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            font-size: 15px;
+            padding: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            color: #e8af30;
+        }
+
+        /* Login button */
         .login-btn {
             width: 100%;
-            padding: 18px;
-            background: var(--primary);
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #e8af30, #dc3250);
             border: none;
-            color: var(--text);
-            font-family: 'Saira Condensed', sans-serif;
-            font-size: 18px;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 12px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 0.5s ease;
         }
 
         .login-btn:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 0 30px rgba(255, 0, 102, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(232, 175, 48, 0.4), 0 4px 12px rgba(220, 50, 80, 0.3);
         }
 
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .login-btn .btn-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin-slow 0.8s linear infinite;
+        }
+
+        .login-btn.loading .btn-spinner {
+            display: block;
+        }
+
+        .login-btn.loading .btn-text {
+            display: none;
+        }
+
+        /* Footer info */
+        .login-footer {
+            text-align: center;
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .login-footer-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.25);
+            line-height: 1.6;
+        }
+
+        .login-footer-text i {
+            color: rgba(232, 175, 48, 0.4);
+            margin-right: 4px;
+        }
+
+        /* Hint box */
         .login-hint {
             text-align: center;
-            color: var(--text-dim);
-            font-size: 10px;
-            margin-top: 20px;
-            padding: 10px;
-            background: var(--dark);
-            border-left: 3px solid var(--secondary);
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(232, 175, 48, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(232, 175, 48, 0.1);
+            line-height: 1.6;
+        }
+
+        .login-hint i {
+            color: #e8af30;
+            margin-right: 4px;
         }
 
         /* MAIN POS INTERFACE */
@@ -749,46 +1140,126 @@
 <body>
     <!-- LOGIN SCREEN -->
     <div class="login-container" id="loginScreen">
+        <!-- Floating cinema particles -->
+        <div class="cinema-particle"><i class="fas fa-film"></i></div>
+        <div class="cinema-particle"><i class="fas fa-ticket-alt"></i></div>
+        <div class="cinema-particle"><i class="fas fa-star"></i></div>
+        <div class="cinema-particle"><i class="fas fa-video"></i></div>
+        <div class="cinema-particle"><i class="fas fa-popcorn"></i></div>
+        <div class="cinema-particle"><i class="fas fa-clapperboard"></i></div>
+        <div class="cinema-particle"><i class="fas fa-masks-theater"></i></div>
+        <div class="cinema-particle"><i class="fas fa-film"></i></div>
+
+        <!-- Film strip decorations -->
+        <div class="film-strip left" id="filmStripLeft"></div>
+        <div class="film-strip right" id="filmStripRight"></div>
+
         <div class="login-box">
+            <div class="login-logo-wrapper">
+                <div class="login-cinema-icon">
+                    <i class="fas fa-clapperboard"></i>
+                </div>
+            </div>
             <div class="login-logo">CINERAMA</div>
-            <div class="login-subtitle">Sistema de Venta de Entradas</div>
+            <div class="login-subtitle">Punto de Venta</div>
+
+            <div class="login-divider">
+                <span>Iniciar Sesión</span>
+            </div>
+
             <div class="input-group">
-                <label>RUC</label>
-                <input type="text" id="ruc" value="Ingrese RUC">
+                <label>RUC Empresa</label>
+                <div class="input-wrapper">
+                    <input type="text" id="ruc" placeholder="Ingrese el RUC">
+                    <i class="fas fa-building input-icon"></i>
+                </div>
             </div>
             <div class="input-group">
                 <label>Usuario</label>
-                <input type="text" id="username" value="cajero">
+                <div class="input-wrapper">
+                    <input type="text" id="username" placeholder="Nombre de usuario">
+                    <i class="fas fa-user input-icon"></i>
+                </div>
             </div>
             <div class="input-group">
                 <label>Contraseña</label>
-                <input type="password" id="password" value="1234">
+                <div class="input-wrapper">
+                    <input type="password" id="password" placeholder="••••••••">
+                    <i class="fas fa-lock input-icon"></i>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
             </div>
-            <button id="loginBtn" onclick="iniciarSesion()" class="login-btn">INGRESAR AL SISTEMA</button>
+
+            <button id="loginBtn" onclick="iniciarSesion()" class="login-btn">
+                <span class="btn-text"><i class="fas fa-right-to-bracket"></i> Ingresar</span>
+                <span class="btn-spinner"></span>
+            </button>
+
             <div class="login-hint">
-                💡 Usuario: Segun Caja | La indicada por Administracion<br>
-                ingresar con su usuario asignado
+                <i class="fas fa-info-circle"></i> Ingrese con su usuario asignado por Administración
+            </div>
+
+            <div class="login-footer">
+                <div class="login-footer-text">
+                    <i class="fas fa-shield-halved"></i> Acceso seguro · Cinerama POS v2.0
+                </div>
             </div>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // Generate film strip decorations
+        $(document).ready(function() {
+            ['filmStripLeft', 'filmStripRight'].forEach(function(id) {
+                var strip = document.getElementById(id);
+                if (strip) {
+                    for (var i = 0; i < 40; i++) {
+                        var hole = document.createElement('div');
+                        hole.className = 'film-strip-hole';
+                        strip.appendChild(hole);
+                    }
+                }
+            });
+        });
+
+        // Toggle password visibility
+        function togglePassword() {
+            var passInput = document.getElementById('password');
+            var eyeIcon = document.getElementById('eyeIcon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
         function iniciarSesion() {
-            var ruc = $("#ruc").val();
-            var username = $("#username").val();
-            var password = $("#password").val();
+            var ruc = $("#ruc").val().trim();
+            var username = $("#username").val().trim();
+            var password = $("#password").val().trim();
+            var $btn = $("#loginBtn");
 
             if (ruc == "" || username == "" || password == "") {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Campos incompletos',
                     text: 'Por favor ingrese todos los campos',
-                    confirmButtonColor: '#ff0055'
+                    confirmButtonColor: '#e8af30',
+                    background: '#16142d',
+                    color: '#fff'
                 });
                 return;
             }
 
+            // Show loading state
+            $btn.addClass('loading');
 
             $.ajax({
                 url: "assets/ajax/login.php",
@@ -799,13 +1270,16 @@
                     password: password
                 },
                 success: function(response) {
+                    $btn.removeClass('loading');
                     if (response.status == "success") {
                         Swal.fire({
                             icon: 'success',
                             title: '¡Bienvenido!',
                             text: 'Acceso concedido',
                             showConfirmButton: false,
-                            timer: 1500
+                            timer: 1500,
+                            background: '#16142d',
+                            color: '#fff'
                         }).then(() => {
                             window.location.href = "index.php";
                         });
@@ -814,24 +1288,28 @@
                             icon: 'error',
                             title: 'Error de acceso',
                             text: response.message,
-                            confirmButtonColor: '#ff0055'
+                            confirmButtonColor: '#e8af30',
+                            background: '#16142d',
+                            color: '#fff'
                         });
                     }
                 },
                 error: function() {
+                    $btn.removeClass('loading');
                     Swal.fire({
                         icon: 'error',
                         title: 'Error de conexión',
                         text: 'No se pudo conectar con el servidor',
-                        confirmButtonColor: '#ff0055'
+                        confirmButtonColor: '#e8af30',
+                        background: '#16142d',
+                        color: '#fff'
                     });
                 }
             });
-
         }
 
-        // Permitir login con Enter
-        $(document).on('keypress', '#password', function(e) {
+        // Permitir login con Enter en cualquier campo
+        $(document).on('keypress', '#ruc, #username, #password', function(e) {
             if (e.which === 13) {
                 iniciarSesion();
             }

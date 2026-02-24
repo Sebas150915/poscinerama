@@ -85,7 +85,8 @@ switch ($action) {
             try {
                 $chk = $connect->query("SHOW TABLES LIKE 'tbl_tarifas'");
                 if ($chk && $chk->rowCount() > 0) $table = 'tbl_tarifas';
-            } catch (PDOException $e) {}
+            } catch (PDOException $e) {
+            }
             if ($table === null) $table = 'tbl_tarifa';
 
             if ($table === 'tbl_tarifas') {
@@ -94,19 +95,29 @@ switch ($action) {
                 try {
                     $res = $connect->query("SHOW COLUMNS FROM tbl_tarifas");
                     $cols = $res->fetchAll(PDO::FETCH_COLUMN, 0);
-                } catch (PDOException $e) {}
+                } catch (PDOException $e) {
+                }
 
                 // Determinar columna de local y construir consulta
-                $localCols = ['id_local','local','idlocal','sede'];
-                $priceCols = ['precio','monto','valor','importe','costo'];
-                $nameCols = ['nombre','name','descripcion','tarifa'];
-                $stateCols = ['estado','activado','activo','habilitado'];
+                $localCols = ['id_local', 'local', 'idlocal', 'sede'];
+                $priceCols = ['precio', 'monto', 'valor', 'importe', 'costo'];
+                $nameCols = ['nombre', 'name', 'descripcion', 'tarifa'];
+                $stateCols = ['estado', 'activado', 'activo', 'habilitado'];
                 $dayColUse = null;
-                if (in_array($dayCol, $cols)) { $dayColUse = $dayCol; }
-                else { $upperDay = strtoupper($dayCol); if (in_array($upperDay, $cols)) { $dayColUse = $upperDay; } }
+                if (in_array($dayCol, $cols)) {
+                    $dayColUse = $dayCol;
+                } else {
+                    $upperDay = strtoupper($dayCol);
+                    if (in_array($upperDay, $cols)) {
+                        $dayColUse = $upperDay;
+                    }
+                }
 
                 $localCol = null;
-                foreach ($localCols as $c) if (in_array($c, $cols)) { $localCol = $c; break; }
+                foreach ($localCols as $c) if (in_array($c, $cols)) {
+                    $localCol = $c;
+                    break;
+                }
 
                 $sql = "SELECT * FROM tbl_tarifas";
                 $params = [];
@@ -124,19 +135,31 @@ switch ($action) {
                     foreach ($stateCols as $sc) {
                         if (array_key_exists($sc, $r)) {
                             $val = strtoupper((string)$r[$sc]);
-                            $active = in_array($val, ['1','SI','SÍ','ACTIVO','HABILITADO','TRUE']);
+                            $active = in_array($val, ['1', 'SI', 'SÍ', 'ACTIVO', 'HABILITADO', 'TRUE']);
                             break;
                         }
                     }
                     $activeDay = true;
                     if ($dayColUse && array_key_exists($dayColUse, $r)) {
                         $valDay = strtoupper((string)$r[$dayColUse]);
-                        $activeDay = in_array($valDay, ['1','SI','SÍ','TRUE']);
+                        $activeDay = in_array($valDay, ['1', 'SI', 'SÍ', 'TRUE']);
                     }
                     if ($active === false || !$activeDay) continue;
 
-                    $name = null; foreach ($nameCols as $nc) { if (isset($r[$nc]) && $r[$nc] !== '') { $name = $r[$nc]; break; } }
-                    $price = null; foreach ($priceCols as $pc) { if (isset($r[$pc]) && is_numeric($r[$pc])) { $price = (float)$r[$pc]; break; } }
+                    $name = null;
+                    foreach ($nameCols as $nc) {
+                        if (isset($r[$nc]) && $r[$nc] !== '') {
+                            $name = $r[$nc];
+                            break;
+                        }
+                    }
+                    $price = null;
+                    foreach ($priceCols as $pc) {
+                        if (isset($r[$pc]) && is_numeric($r[$pc])) {
+                            $price = (float)$r[$pc];
+                            break;
+                        }
+                    }
                     if ($name !== null && $price !== null) {
                         $tariffs[] = ['id' => $r['id'] ?? null, 'name' => $name, 'price' => $price];
                     }
@@ -155,7 +178,8 @@ switch ($action) {
                     $stSala = $connect->prepare($qSala);
                     $stSala->execute([$idSala]);
                     $tariffs = $stSala->fetchAll(PDO::FETCH_ASSOC);
-                } catch (PDOException $e) {}
+                } catch (PDOException $e) {
+                }
             }
 
             // Fallback a tabla global si sigue vacío
@@ -165,19 +189,34 @@ switch ($action) {
                     try {
                         $resG = $connect->query("SHOW COLUMNS FROM tbl_tarifa");
                         $colsG = $resG->fetchAll(PDO::FETCH_COLUMN, 0);
-                    } catch (PDOException $e) {}
-                    $localColsG = ['id_local','local','idlocal','sede'];
+                    } catch (PDOException $e) {
+                    }
+                    $localColsG = ['id_local', 'local', 'idlocal', 'sede'];
                     $localColG = null;
-                    foreach ($localColsG as $c) if (in_array($c, $colsG)) { $localColG = $c; break; }
+                    foreach ($localColsG as $c) if (in_array($c, $colsG)) {
+                        $localColG = $c;
+                        break;
+                    }
                     $dayColUseG = null;
-                    if (in_array($dayCol, $colsG)) { $dayColUseG = $dayCol; }
-                    else { $upperDay = strtoupper($dayCol); if (in_array($upperDay, $colsG)) { $dayColUseG = $upperDay; } }
+                    if (in_array($dayCol, $colsG)) {
+                        $dayColUseG = $dayCol;
+                    } else {
+                        $upperDay = strtoupper($dayCol);
+                        if (in_array($upperDay, $colsG)) {
+                            $dayColUseG = $upperDay;
+                        }
+                    }
                     $hasEstado = in_array('estado', $colsG);
                     $sqlG = "SELECT id, nombre as name, precio as price FROM tbl_tarifa WHERE 1=1";
                     $paramsG = [];
                     if ($hasEstado) $sqlG .= " AND estado = '1'";
-                    if ($idLocal && $localColG) { $sqlG .= " AND $localColG = ?"; $paramsG[] = $idLocal; }
-                    if ($dayColUseG) { $sqlG .= " AND `$dayColUseG` = '1'"; }
+                    if ($idLocal && $localColG) {
+                        $sqlG .= " AND $localColG = ?";
+                        $paramsG[] = $idLocal;
+                    }
+                    if ($dayColUseG) {
+                        $sqlG .= " AND `$dayColUseG` = '1'";
+                    }
                     $stmt = $connect->prepare($sqlG);
                     $stmt->execute($paramsG);
                     $tariffs = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -291,10 +330,15 @@ switch ($action) {
             $tipoComprobante = $input['tipo_comprobante'];
             $medioPago = $input['medio_pago'];
             $items = $input['items'];
-            $codigo = "POS-" . date('YmdHis') . rand(10, 99);
-            $idLocal = $_SESSION['id_local'];
-            $clienteDoc = $input['cliente_doc'] ?? '';
             $clienteNombre = $input['cliente_nombre'] ?? '';
+            $serieFinal = $input['serie'] ?? '';
+            $numeroFinal = $input['num_doc'] ?? '';
+
+            if ($serieFinal != '' && $numeroFinal != '') {
+                $codigo = $serieFinal . "-" . str_pad($numeroFinal, 8, "0", STR_PAD_LEFT);
+            } else {
+                $codigo = "POS-" . date('YmdHis') . rand(10, 99);
+            }
             if ($idFuncion <= 0) {
                 if ($idCartelera <= 0 || $idHora <= 0) {
                     throw new Exception("Falta identificar función");
@@ -330,13 +374,15 @@ switch ($action) {
             try {
                 $resSA = $connect->query("SHOW COLUMNS FROM tbl_sala_asiento");
                 $colsSA = $resSA->fetchAll(PDO::FETCH_COLUMN, 0);
-            } catch (PDOException $e) {}
+            } catch (PDOException $e) {
+            }
             $numCol = in_array('numero', $colsSA) ? 'numero' : 'columna';
             $colsB = [];
             try {
                 $resB = $connect->query("SHOW COLUMNS FROM tbl_boletos");
                 $colsB = $resB->fetchAll(PDO::FETCH_COLUMN, 0);
-            } catch (PDOException $e) {}
+            } catch (PDOException $e) {
+            }
             $hasCart = in_array('id_cartelera', $colsB);
             $hasHora = in_array('id_hora', $colsB);
             foreach ($items as $item) {
@@ -569,7 +615,8 @@ switch ($action) {
                     $row['distrito'] = $data['distrito'];
                     $row['provincia'] = $data['provincia'];
                     $row['departamento'] = $data['departamento'];
-                } catch (Exception $e) {}
+                } catch (Exception $e) {
+                }
             }
             $row['nombre'] = $data['nombre'];
             echo json_encode(['status' => 'success', 'data' => $row, 'source' => 'api']);
@@ -591,6 +638,34 @@ switch ($action) {
                 echo json_encode(['status' => 'success', 'data' => $row]);
             } else {
                 echo json_encode(['status' => 'error', 'message' => 'Contribuyente no encontrado']);
+            }
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'searchSerie':
+        try {
+            $cod = $_POST['cod'] ?? $_POST['cliente'] ?? '';
+            $user = $_POST['usuario'] ?? 0;
+            $emp = $_POST['empresa'] ?? 0;
+
+            if ($cod === '') {
+                throw new Exception("Código de documento requerido");
+            }
+
+            // En poscinerama, verificamos si existe vw_tbl_serie_usuario
+            // Si no, podemos intentar consultar tbl_series directamente o seguir el patrón de smartbase3
+            $query = "SELECT * FROM vw_tbl_serie_usuario WHERE cod = ? AND usuario = ? AND empresa = ?";
+            $stmt = $connect->prepare($query);
+            $stmt->execute([$cod, $user, $emp]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($row) {
+                echo json_encode($row);
+            } else {
+                // Fallback o respuesta vacía si no existe la vista/serie
+                echo json_encode(['serie' => '', 'numero' => '']);
             }
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
